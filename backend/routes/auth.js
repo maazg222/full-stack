@@ -12,8 +12,8 @@ const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 // Use the environment variable, but allow it to be dynamic based on the request host if needed
 // However, Discord requires EXACT matches in the portal.
 const getRedirectUri = (req) => {
-  // Always prioritize localhost:5000 for development as requested
-  return 'http://localhost:5000/api/auth/discord/callback';
+  // Use the environment variable if available, otherwise fallback to localhost
+  return process.env.DISCORD_REDIRECT_URI || 'http://localhost:5000/api/auth/discord/callback';
 };
 
 router.get('/user/:id', async (req, res) => {
