@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guild Settings | Agency Development</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="clean-urls.js" defer></script>
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 20px 60px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+            backdrop-filter: blur(10px);
+        }
+
+        .guild-info-sidebar {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-guild-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 22px;
+            margin: 0 auto 1rem;
+            background: #2c2f33;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            overflow: hidden;
+            border: 2px solid var(--accent-red);
+            box-shadow: 0 10px 20px rgba(255, 0, 0, 0.2);
+        }
+
+        .sidebar-guild-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.2) 0%, rgba(255, 0, 0, 0.05) 100%);
+            color: white;
+            border-color: rgba(255, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.1);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Content Styles */
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem 2rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .settings-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 28px;
+            padding: 2.5rem;
+            display: none;
+            min-height: 500px;
+        }
+
+        .settings-panel.active {
+            display: block;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .setting-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .setting-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #2c2f33;
+            transition: .4s;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, var(--accent-red) 0%, #ff4d4d 100%);
+            border-color: transparent;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .input-group {
+            margin-top: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            margin-bottom: 10px;
+        }
+
+        .input-group select, .input-group input, .input-group textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group select:focus, .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.1);
+        }
+
+        .cmd-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .category-title {
+            grid-column: 1 / -1;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 2rem 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255, 0, 0, 0.2), transparent);
+        }
+
+        .cmd-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.2rem;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .cmd-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .cmd-info h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .cmd-info p {
+            margin: 4px 0 0;
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+
+        .btn-save-float {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            padding: 18px 36px;
+            border-radius: 40px;
+            box-shadow: 0 15px 35px rgba(255, 0, 0, 0.4);
+            z-index: 100;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-save-float:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 20px 45px rgba(255, 0, 0, 0.5);
+        }
+
+        .hidden { display: none !important; }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-premium { background: linear-gradient(135deg, #ffd700, #ffa500); color: black; }
+        .badge-beta { background: #5865f2; color: white; }
+
+        /* Bot Invite Overlay */
+        .bot-invite-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 12, 0.95);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            transition: all 0.5s ease;
+        }
+
+        .bot-invite-content {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 4rem;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .bot-invite-icon {
+            font-size: 5rem;
+            color: var(--accent-red);
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .invite-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                padding-top: 80px;
+            }
+            .sidebar {
+                position: relative;
+                top: 0;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Bot Invite Overlay -->
+    <div id="bot-invite-overlay" class="bot-invite-overlay hidden">
+        <div class="bot-invite-content">
+            <div class="bot-invite-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 1rem;">Bot Not Found!</h2>
+            <p style="color: var(--text-gray); font-size: 1.1rem; line-height: 1.6;">The bot is not present in <b><span id="missing-guild-name">this server</span></b>. Please invite it to start using the dashboard.</p>
+            
+            <div class="invite-btns">
+                <a href="https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=8&scope=bot%20applications.commands" id="invite-link" target="_blank" class="btn btn-primary" style="padding: 18px; border-radius: 16px; font-weight: 800;">
+                    <i class="fas fa-plus-circle" style="margin-right: 10px;"></i> Invite Bot to Server
+                </a>
+                <button onclick="checkBotPresence()" class="btn btn-outline" style="padding: 18px; border-radius: 16px; font-weight: 700;">
+                    <i class="fas fa-sync-alt" style="margin-right: 10px;"></i> I've Added It, Check Again
+                </button>
+                <a href="dashboard.html" style="color: var(--text-gray); text-decoration: none; font-size: 0.9rem; margin-top: 10px;">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="home.html" class="logo">AGENCY<span>DEV</span></a>
+            <div class="nav-links">
+                <a href="dashboard.html" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+            </div>
+            <div class="nav-btns" id="nav-auth">
+                <!-- User Profile -->
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="guild-info-sidebar">
+                <div id="sidebar-icon" class="sidebar-guild-icon"></div>
+                <h3 id="sidebar-name" style="font-weight: 800; margin-bottom: 5px; font-size: 1.2rem;">Server Name</h3>
+                <p id="sidebar-id" style="font-size: 0.7rem; color: var(--text-gray); font-family: monospace;">ID: 0000000000</p>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item active" onclick="showTab('overview')">
+                    <i class="fas fa-home"></i> Overview
+                </div>
+                <div class="nav-item" onclick="showTab('automod')">
+                    <i class="fas fa-shield-alt"></i> Automod
+                </div>
+                <div class="nav-item" onclick="showTab('logging')">
+                    <i class="fas fa-list-ul"></i> Logging
+                </div>
+                <div class="nav-item" onclick="showTab('commands')">
+                    <i class="fas fa-terminal"></i> Commands
+                </div>
+                <div class="nav-item" onclick="showTab('welcome')">
+                    <i class="fas fa-door-open"></i> Welcome
+                </div>
+                <div class="nav-item" onclick="showTab('premium')">
+                    <i class="fas fa-crown" style="color: #ffd700;"></i> Premium
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="settings-content">
+            <div class="content-header">
+                <div>
+                    <h1 id="tab-title" style="font-size: 2rem; font-weight: 900; letter-spacing: -1px; margin: 0;">Overview</h1>
+                    <p style="color: var(--text-gray); margin: 5px 0 0; font-size: 0.9rem;">Manage your server's core settings and modules.</p>
+                </div>
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save" style="margin-right: 8px;"></i> Save Changes
+                </button>
+            </div>
+
+            <!-- Overview Panel -->
+            <div id="overview-panel" class="settings-panel active">
+                <div class="settings-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="stat-card" style="background: rgba(255,255,255,0.03); padding: 2rem; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Bot Status</div>
+                        <div id="bot-connection-status" style="font-weight: 800; color: #555; display: flex; align-items: center; gap: 10px; font-size: 1.1rem;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #555;" id="status-dot"></div>
+                            <span id="status-text">Connecting...</span>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="background: rgba(255,255,255,0.03); padding: 2rem; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Prefix</div>
+                        <div style="font-weight: 800; color: var(--accent-red); font-size: 1.1rem;">
+                            <i class="fas fa-bolt" style="margin-right: 8px;"></i> Slash Commands
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <h3 style="margin-bottom: 1rem; font-weight: 800;">Server Quick Stats</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 16px;">
+                            <div style="color: var(--text-gray); font-size: 0.8rem; margin-bottom: 5px;">Active Modules</div>
+                            <div style="font-size: 1.5rem; font-weight: 900;" id="active-modules-count">0</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 16px;">
+                            <div style="color: var(--text-gray); font-size: 0.8rem; margin-bottom: 5px;">Enabled Commands</div>
+                            <div style="font-size: 1.5rem; font-weight: 900;" id="enabled-cmds-count">12</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automod Panel -->
+            <div id="automod-panel" class="settings-panel">
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                <h3 style="font-weight: 800; margin: 0;">General Protection</h3>
+                                <span class="badge badge-beta">Beta</span>
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--text-gray); max-width: 500px;">The main engine for server safety. Enabling this allows all selected sub-modules to function.</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="automod-enabled">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <div class="setting-card" style="margin-bottom: 0;">
+                        <div class="setting-header">
+                            <div>
+                                <h3 style="font-weight: 700; margin-bottom: 5px;"><i class="fas fa-ghost" style="color: #5865f2; margin-right: 8px;"></i> Anti-Spam</h3>
+                                <p style="font-size: 0.8rem; color: var(--text-gray);">Automatically mutes users sending too many messages.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="anti-spam">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-card" style="margin-bottom: 0;">
+                        <div class="setting-header">
+                            <div>
+                                <h3 style="font-weight: 700; margin-bottom: 5px;"><i class="fas fa-link" style="color: #ffa500; margin-right: 8px;"></i> Anti-Link</h3>
+                                <p style="font-size: 0.8rem; color: var(--text-gray);">Blocks unauthorized discord invites and links.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="anti-link">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-card" style="margin-bottom: 0;">
+                        <div class="setting-header">
+                            <div>
+                                <h3 style="font-weight: 700; margin-bottom: 5px;"><i class="fas fa-exclamation-triangle" style="color: #ff4d4d; margin-right: 8px;"></i> Bad Words</h3>
+                                <p style="font-size: 0.8rem; color: var(--text-gray);">Filters out offensive language from chat.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="anti-badwords">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logging Panel -->
+            <div id="logging-panel" class="settings-panel">
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div style="flex: 1;">
+                            <h3 style="font-weight: 800; margin-bottom: 8px;"><i class="fas fa-history" style="color: #00ff00; margin-right: 10px;"></i> Advanced Logging</h3>
+                            <p style="font-size: 0.9rem; color: var(--text-gray); max-width: 500px;">Keep a detailed audit trail of message edits, deletions, member joins, and moderator actions.</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="logging-enabled">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="input-group" id="logging-config" style="opacity: 0.5; pointer-events: none; transition: all 0.3s ease;">
+                        <label>Select Log Channel</label>
+                        <select id="logging-channel">
+                            <option value="">Loading channels...</option>
+                        </select>
+                        <p style="font-size: 0.75rem; color: var(--text-gray); margin-top: 10px;">
+                            <i class="fas fa-info-circle"></i> Make sure the bot has "View Channel" and "Send Messages" permissions in this channel.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commands Panel -->
+            <div id="commands-panel" class="settings-panel">
+                <div class="setting-card" style="background: rgba(255, 255, 255, 0.01); border-style: dashed;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3 style="font-weight: 800; margin: 0;">Moderation Commands</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline" style="padding: 5px 15px; font-size: 0.7rem;" onclick="toggleAllCmds(true)">Enable All</button>
+                            <button class="btn btn-outline" style="padding: 5px 15px; font-size: 0.7rem;" onclick="toggleAllCmds(false)">Disable All</button>
+                        </div>
+                    </div>
+                    <div class="cmd-grid" id="mod-cmd-list">
+                        <div class="category-title">Moderation</div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Ban</h4>
+                                <p>Permanently ban users.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-ban" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Kick</h4>
+                                <p>Remove users from server.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-kick" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Timeout</h4>
+                                <p>Temporarily mute users.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-timeout" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Warn</h4>
+                                <p>Issue formal warnings.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-warn" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Infractions</h4>
+                                <p>View user warning history.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-infractions" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="category-title">Management</div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Clear</h4>
+                                <p>Bulk delete messages.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-clear" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Slowmode</h4>
+                                <p>Control chat speed.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-slowmode" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Lock</h4>
+                                <p>Lock current channel.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-lock" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Unlock</h4>
+                                <p>Unlock current channel.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-unlock" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Nuke</h4>
+                                <p>Recreate and clear channel.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-nuke" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Purge User</h4>
+                                <p>Clear specific user's msgs.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-purge" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Nickname</h4>
+                                <p>Change member nicknames.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-nickname" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Role</h4>
+                                <p>Manage member roles.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-role" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="category-title">Utility</div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Ping</h4>
+                                <p>Check bot latency.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-ping" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Server Info</h4>
+                                <p>Get server details.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-serverinfo" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>User Info</h4>
+                                <p>Get member details.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-userinfo" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Avatar</h4>
+                                <p>Get user's avatar.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-avatar" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="category-title">Fun</div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>8ball</h4>
+                                <p>Ask the magic 8ball.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-8ball" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Meme</h4>
+                                <p>Get a random meme.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-meme" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="cmd-item">
+                            <div class="cmd-info">
+                                <h4>Dice</h4>
+                                <p>Roll a 6-sided die.</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="cmd-toggle" id="cmd-dice" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Welcome Panel -->
+            <div id="welcome-panel" class="settings-panel">
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <div style="flex: 1;">
+                            <h3 style="font-weight: 800; margin-bottom: 8px;"><i class="fas fa-hand-sparkles" style="color: #ffa500; margin-right: 10px;"></i> Welcome Messages</h3>
+                            <p style="font-size: 0.9rem; color: var(--text-gray);">Send a custom message to new members when they join.</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="welcome-enabled">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div id="welcome-config" style="opacity: 0.5; pointer-events: none; transition: all 0.3s ease;">
+                        <div class="input-group">
+                            <label>Welcome Channel</label>
+                            <select id="welcome-channel">
+                                <option value="">Select a channel...</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Custom Message</label>
+                            <textarea id="welcome-message" rows="4" placeholder="Welcome {user} to {server}! You are member #{count}."></textarea>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <span style="font-size: 0.7rem; color: var(--accent-red); cursor: pointer;" onclick="insertVar('{user}')">{user}</span>
+                                <span style="font-size: 0.7rem; color: var(--accent-red); cursor: pointer;" onclick="insertVar('{server}')">{server}</span>
+                                <span style="font-size: 0.7rem; color: var(--accent-red); cursor: pointer;" onclick="insertVar('{count}')">{count}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Panel -->
+            <div id="premium-panel" class="settings-panel">
+                <div style="text-align: center; padding: 3rem 0;">
+                    <i class="fas fa-crown" style="font-size: 4rem; color: #ffd700; margin-bottom: 1.5rem; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));"></i>
+                    <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem;">Unlock Premium</h2>
+                    <p style="color: var(--text-gray); font-size: 1.1rem; max-width: 600px; margin: 0 auto 2.5rem;">Get access to AI moderation, unlimited logs, and custom branding for your server.</p>
+                    <a href="pricing.html" class="btn btn-primary" style="padding: 15px 40px; border-radius: 30px; font-size: 1.1rem;">View Pricing</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <button class="btn btn-primary btn-save-float" id="save-btn" onclick="saveSettings()">
+        <i class="fas fa-save"></i> Save All Changes
+    </button>
+
+    <script src="config.js"></script>
+    <script>
+        let currentUser = null;
+        let guildId = null;
+        let currentGuild = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userStr = localStorage.getItem('agency_chat_user');
+            if (!userStr) {
+                window.location.href = 'home.html';
+                return;
+            }
+            currentUser = JSON.parse(userStr);
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            guildId = urlParams.get('id');
+            
+            if (!guildId) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            currentGuild = currentUser.guilds.find(g => g.id === guildId);
+            if (!currentGuild) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // UI Listeners
+            document.getElementById('logging-enabled').addEventListener('change', (e) => {
+                const config = document.getElementById('logging-config');
+                config.style.opacity = e.target.checked ? '1' : '0.5';
+                config.style.pointerEvents = e.target.checked ? 'all' : 'none';
+            });
+
+            document.getElementById('welcome-enabled').addEventListener('change', (e) => {
+                const config = document.getElementById('welcome-config');
+                config.style.opacity = e.target.checked ? '1' : '0.5';
+                config.style.pointerEvents = e.target.checked ? 'all' : 'none';
+            });
+
+            updateSidebar();
+            loadGuildSettings();
+            loadChannels();
+            updateNavbar();
+        });
+
+        function updateNavbar() {
+            const navAuth = document.getElementById('nav-auth');
+            navAuth.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px; padding: 5px 15px; background: rgba(255, 255, 255, 0.05); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <img src="${currentUser.avatar}" style="width: 30px; height: 30px; border-radius: 50%;" alt="Avatar">
+                    <span style="font-weight: 600; font-size: 0.9rem;">${currentUser.name}</span>
+                </div>
+            `;
+        }
+
+        function updateSidebar() {
+            document.getElementById('sidebar-name').innerText = currentGuild.name;
+            document.getElementById('sidebar-id').innerText = `ID: ${currentGuild.id}`;
+            
+            const iconContainer = document.getElementById('sidebar-icon');
+            if (currentGuild.icon) {
+                iconContainer.innerHTML = `<img src="https://cdn.discordapp.com/icons/${currentGuild.id}/${currentGuild.icon}.png" alt="${currentGuild.name}">`;
+            } else {
+                iconContainer.innerHTML = currentGuild.name.charAt(0);
+            }
+        }
+
+        async function loadGuildSettings() {
+            try {
+                const response = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${guildId}/settings`);
+                
+                if (!response.ok && response.status === 404) {
+                    showInviteOverlay();
+                    return;
+                }
+
+                const settings = await response.json();
+                const statusDot = document.getElementById('status-dot');
+                const statusText = document.getElementById('status-text');
+
+                if (settings && !settings.error) {
+                    hideInviteOverlay();
+                    document.getElementById('automod-enabled').checked = settings.automod_enabled || false;
+                    document.getElementById('logging-enabled').checked = settings.logging_enabled || false;
+                    document.getElementById('anti-spam').checked = settings.anti_spam || false;
+                    document.getElementById('anti-link').checked = settings.anti_link || false;
+                    document.getElementById('anti-badwords').checked = settings.anti_badwords || false;
+                    
+                    if (settings.logging_enabled) {
+                        const config = document.getElementById('logging-config');
+                        config.style.opacity = '1';
+                        config.style.pointerEvents = 'all';
+                    }
+
+                    // Load commands
+                    if (settings.commands) {
+                        const cmds = settings.commands;
+                        // Moderation
+                        if (cmds.ban !== undefined) document.getElementById('cmd-ban').checked = cmds.ban;
+                        if (cmds.kick !== undefined) document.getElementById('cmd-kick').checked = cmds.kick;
+                        if (cmds.timeout !== undefined) document.getElementById('cmd-timeout').checked = cmds.timeout;
+                        if (cmds.warn !== undefined) document.getElementById('cmd-warn').checked = cmds.warn;
+                        if (cmds.infractions !== undefined) document.getElementById('cmd-infractions').checked = cmds.infractions;
+                        
+                        // Management
+                        if (cmds.clear !== undefined) document.getElementById('cmd-clear').checked = cmds.clear;
+                        if (cmds.slowmode !== undefined) document.getElementById('cmd-slowmode').checked = cmds.slowmode;
+                        if (cmds.lock !== undefined) document.getElementById('cmd-lock').checked = cmds.lock;
+                        if (cmds.unlock !== undefined) document.getElementById('cmd-unlock').checked = cmds.unlock;
+                        if (cmds.nuke !== undefined) document.getElementById('cmd-nuke').checked = cmds.nuke;
+                        if (cmds.purge !== undefined) document.getElementById('cmd-purge').checked = cmds.purge;
+                        if (cmds.nickname !== undefined) document.getElementById('cmd-nickname').checked = cmds.nickname;
+                        if (cmds.role !== undefined) document.getElementById('cmd-role').checked = cmds.role;
+
+                        // Utility
+                        if (cmds.ping !== undefined) document.getElementById('cmd-ping').checked = cmds.ping;
+                        if (cmds.serverinfo !== undefined) document.getElementById('cmd-serverinfo').checked = cmds.serverinfo;
+                        if (cmds.userinfo !== undefined) document.getElementById('cmd-userinfo').checked = cmds.userinfo;
+                        if (cmds.avatar !== undefined) document.getElementById('cmd-avatar').checked = cmds.avatar;
+
+                        // Fun
+                        if (cmds['8ball'] !== undefined) document.getElementById('cmd-8ball').checked = cmds['8ball'];
+                        if (cmds.meme !== undefined) document.getElementById('cmd-meme').checked = cmds.meme;
+                        if (cmds.dice !== undefined) document.getElementById('cmd-dice').checked = cmds.dice;
+                    }
+
+                    // Update counts
+                    let activeCount = 0;
+                    if (settings.automod_enabled) activeCount++;
+                    if (settings.logging_enabled) activeCount++;
+                    if (settings.welcome_enabled) activeCount++;
+                    document.getElementById('active-modules-count').innerText = activeCount;
+
+                    const enabledCmds = document.querySelectorAll('.cmd-toggle:checked').length;
+                    document.getElementById('enabled-cmds-count').innerText = enabledCmds;
+
+                    statusDot.style.background = '#00ff00';
+                    statusDot.style.boxShadow = '0 0 10px rgba(0, 255, 0, 0.5)';
+                    statusText.innerText = 'Online & Ready';
+                    statusText.style.color = '#00ff00';
+                } else {
+                    showInviteOverlay();
+                }
+            } catch (error) {
+                console.error('Failed to load settings:', error);
+                showInviteOverlay();
+            }
+        }
+
+        function showInviteOverlay() {
+            document.getElementById('bot-invite-overlay').classList.remove('hidden');
+            document.getElementById('missing-guild-name').innerText = currentGuild.name;
+            // Update invite link with actual client ID if possible, or use a placeholder
+            // document.getElementById('invite-link').href = `...`;
+        }
+
+        function hideInviteOverlay() {
+            document.getElementById('bot-invite-overlay').classList.add('hidden');
+        }
+
+        async function checkBotPresence() {
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            btn.disabled = true;
+
+            await loadGuildSettings();
+            await loadChannels();
+
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        async function loadChannels() {
+            try {
+                const response = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${guildId}/channels`);
+                const channels = await response.json();
+                
+                const logSelect = document.getElementById('logging-channel');
+                const welcomeSelect = document.getElementById('welcome-channel');
+                
+                [logSelect, welcomeSelect].forEach(select => {
+                    select.innerHTML = '<option value="">Select a channel...</option>';
+                    if (Array.isArray(channels)) {
+                        channels.forEach(ch => {
+                            if (ch.type === 0) { // Text channel
+                                const opt = document.createElement('option');
+                                opt.value = ch.id;
+                                opt.innerText = `# ${ch.name}`;
+                                select.appendChild(opt);
+                            }
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to load channels:', error);
+            }
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.innerText.toLowerCase().includes(tabId)) {
+                    item.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.settings-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(`${tabId}-panel`).classList.add('active');
+            
+            document.getElementById('tab-title').innerText = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+        }
+
+        function toggleAllCmds(state) {
+            document.querySelectorAll('.cmd-toggle').forEach(cb => cb.checked = state);
+        }
+
+        function insertVar(v) {
+            const area = document.getElementById('welcome-message');
+            area.value += v;
+            area.focus();
+        }
+
+        async function saveSettings() {
+            const btn = document.getElementById('save-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            const settings = {
+                automod_enabled: document.getElementById('automod-enabled').checked,
+                anti_spam: document.getElementById('anti-spam').checked,
+                anti_link: document.getElementById('anti-link').checked,
+                anti_badwords: document.getElementById('anti-badwords').checked,
+                logging_enabled: document.getElementById('logging-enabled').checked,
+                log_channel_id: document.getElementById('logging-channel').value,
+                welcome_enabled: document.getElementById('welcome-enabled').checked,
+                welcome_channel_id: document.getElementById('welcome-channel').value,
+                welcome_message: document.getElementById('welcome-message').value,
+                commands: {
+                    ban: document.getElementById('cmd-ban').checked,
+                    kick: document.getElementById('cmd-kick').checked,
+                    timeout: document.getElementById('cmd-timeout').checked,
+                    warn: document.getElementById('cmd-warn').checked,
+                    infractions: document.getElementById('cmd-infractions').checked,
+                    clear: document.getElementById('cmd-clear').checked,
+                    slowmode: document.getElementById('cmd-slowmode').checked,
+                    lock: document.getElementById('cmd-lock').checked,
+                    unlock: document.getElementById('cmd-unlock').checked,
+                    nuke: document.getElementById('cmd-nuke').checked,
+                    purge: document.getElementById('cmd-purge').checked,
+                    nickname: document.getElementById('cmd-nickname').checked,
+                    role: document.getElementById('cmd-role').checked,
+                    ping: document.getElementById('cmd-ping').checked,
+                    serverinfo: document.getElementById('cmd-serverinfo').checked,
+                    userinfo: document.getElementById('cmd-userinfo').checked,
+                    avatar: document.getElementById('cmd-avatar').checked,
+                    '8ball': document.getElementById('cmd-8ball').checked,
+                    meme: document.getElementById('cmd-meme').checked,
+                    dice: document.getElementById('cmd-dice').checked
+                }
+            };
+
+            try {
+                const response = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${guildId}/settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+                
+                if (response.ok) {
+                    showNotification('Success', 'Settings updated successfully!', 'success');
+                } else {
+                    showNotification('Error', 'Failed to update settings.', 'error');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showNotification('Error', 'Connection failed.', 'error');
+            } finally {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        }
+
+        function showNotification(title, text, type = 'info') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.style.cssText = `
+                    position: fixed;
+                    bottom: 24px;
+                    right: 24px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                    z-index: 10000;
+                    pointer-events: none;
+                `;
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.style.pointerEvents = 'auto';
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                         type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            
+            const color = type === 'success' ? '#00c853' : 
+                          type === 'error' ? '#ff3333' : '#2196f3';
+
+            toast.style.cssText = `
+                background: rgba(10, 10, 10, 0.95);
+                backdrop-filter: blur(10px);
+                border: 1px solid ${color}44;
+                border-left: 4px solid ${color};
+                color: #fff;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                transform: translateX(120%);
+                transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                min-width: 320px;
+                max-width: 450px;
+            `;
+
+            toast.innerHTML = `
+                <i class="fas ${icon}" style="color: ${color}; font-size: 1.2rem;"></i>
+                <div style="flex: 1; line-height: 1.4;">
+                    <div style="font-size: 0.75rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;">${title}</div>
+                    <div>${text}</div>
+                </div>
+                <i class="fas fa-times" style="cursor: pointer; color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;" onclick="this.parentElement.style.transform='translateX(120%)'; setTimeout(()=>this.parentElement.remove(), 400)"></i>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+            }, 10);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.transform = 'translateX(120%)';
+                    setTimeout(() => toast.remove(), 400);
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

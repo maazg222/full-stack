@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commands | AGENCY DEV</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="clean-urls.js" defer></script>
+    <style>
+        @keyframes float-cycle {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-cycle {
+            animation: float-cycle 3s ease-in-out infinite;
+        }
+
+        .cmd-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 20px;
+        }
+
+        .cmd-hero {
+            padding-top: 140px;
+            padding-bottom: 40px;
+            text-align: center;
+        }
+        .cmd-hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(180deg, #fff 0%, #777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .cmd-hero p {
+            color: var(--text-gray);
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        .cmd-hero .hero-tag {
+            display: inline-block;
+            padding: 0.45rem 1rem;
+            background: var(--accent-red-muted);
+            color: var(--accent-red);
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        /* Sidebar Menu */
+        .cmd-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .bot-selector {
+            display: flex;
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 4px;
+            border-radius: 14px;
+            margin-bottom: 2rem;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            height: 48px;
+            align-items: stretch;
+        }
+
+        .bot-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc((100% - 8px) / 3);
+            height: calc(100% - 8px);
+            background: var(--accent-red);
+            border-radius: 10px;
+            transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 0;
+            box-shadow: 0 4px 15px rgba(255, 46, 46, 0.25);
+            will-change: transform, background-color;
+        }
+
+        .bot-tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 800;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 2;
+            user-select: none;
+            text-transform: uppercase;
+        }
+
+        .bot-tab:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .bot-tab.active {
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .bot-selector[data-bot="hitman"] .bot-slider {
+            transform: translateX(0);
+            background: var(--accent-red);
+        }
+
+        .bot-selector[data-bot="agxz"] .bot-slider {
+            transform: translateX(100%);
+            background: #3b82f6;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .bot-selector[data-bot="monix"] .bot-slider {
+            transform: translateX(200%);
+            background: var(--accent-red);
+        }
+
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .category-item {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .category-item.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        /* Commands Grid */
+        .cmd-main {
+            padding-bottom: 5rem;
+        }
+
+        .cmd-header {
+            margin-bottom: 3rem;
+        }
+
+        .cmd-toolbar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin: 1rem 0 1.5rem;
+        }
+        .pro-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-gray);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .pro-toggle.active {
+            background: var(--accent-red);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 6px 18px rgba(255, 51, 51, 0.2);
+        }
+
+        .cmd-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .cmd-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .cmd-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .cmd-card.pro {
+            border: 1px solid var(--accent-red);
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.1);
+        }
+
+        .cmd-card.pro:hover {
+            box-shadow: 0 10px 30px rgba(255, 51, 51, 0.15);
+        }
+
+        .badge-pro {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-red);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .cmd-name {
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .cmd-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .cmd-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cmd-usage {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #10b981;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+
+        .cmd-perm {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-btn {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            font-size: 0.72rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Search Bar */
+        .search-box {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="home.html" class="logo">AGENCY<span>DEV</span></a>
+            <div class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="bots.html">Bots</a>
+                <a href="commands.html" class="active">Commands</a>
+                <a href="pricing.html">Premium</a>
+                <a href="community.html">Community</a>
+            </div>
+            <div class="nav-btns">
+                <a href="dashboard" class="btn btn-primary">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="cmd-hero animate__animated animate__fadeInDown">
+        <div class="container">
+            <div class="hero-tag animate__animated animate__pulse animate__infinite">Command Center</div>
+            <h1>Discover Powerful Modules</h1>
+            <p>Explore secure, high‑performance commands. Upgrade to unlock premium automations and advanced protection.</p>
+        </div>
+    </header>
+
+    <div class="cmd-container">
+        <!-- Sidebar Menu -->
+        <aside class="cmd-sidebar animate__animated animate__fadeInLeft">
+            <div class="bot-selector" data-bot="hitman">
+                <div class="bot-tab active hitman" onclick="switchBot('hitman')">HITMAN</div>
+                <div class="bot-tab agxz" onclick="switchBot('agxz')">AGXZ</div>
+                <div class="bot-tab monix" onclick="switchBot('monix')">MONIX</div>
+                <div class="bot-slider"></div>
+            </div>
+
+            <div class="category-list">
+                <div class="category-item active"><i class="fas fa-radiation"></i> Antinuke</div>
+                <div class="category-item"><i class="fas fa-shield-alt"></i> Security</div>
+                <div class="category-item"><i class="fas fa-robot"></i> Automod</div>
+                <div class="category-item"><i class="fas fa-coins"></i> Economy</div>
+                <div class="category-item"><i class="fas fa-server"></i> Server Commands</div>
+                <div class="category-item"><i class="fas fa-gift"></i> Giveaway Commands</div>
+                <div class="category-item"><i class="fas fa-eye-slash"></i> Ignore Commands</div>
+                <div class="category-item"><i class="fas fa-door-open"></i> Welcomer Commands</div>
+                <div class="category-item"><i class="fas fa-robot"></i> AI Chat</div>
+                <div class="category-item"><i class="fas fa-lock"></i> Jail Commands</div>
+                <div class="category-item"><i class="fas fa-heart"></i> Marry Commands</div>
+                <div class="category-item"><i class="fas fa-volume-up"></i> Voice Commands</div>
+                <div class="category-item"><i class="fas fa-microphone"></i> J2C Commands</div>
+                <div class="category-item"><i class="fas fa-photo-video"></i> Media Commands</div>
+                <div class="category-item"><i class="fas fa-star"></i> General Commands</div>
+                <div class="category-item"><i class="fas fa-music"></i> Music</div>
+                <div class="category-item"><i class="fas fa-hammer"></i> Moderation</div>
+                <div class="category-item"><i class="fas fa-gamepad"></i> Fun & Games</div>
+                <div class="category-item"><i class="fas fa-tools"></i> Utilities</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="cmd-main animate__animated animate__fadeInRight">
+            <div class="cmd-header animate-cycle">
+                <h1 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 0.5rem;">System Commands</h1>
+                <p style="color: var(--text-gray); font-size: 0.95rem;">Browse and search through all available bot modules.</p>
+            </div>
+
+            <div class="cmd-toolbar">
+                <div id="proToggle" class="pro-toggle"><i class="fas fa-gem"></i> Show Pro only</div>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search commands (e.g. antinuke, emergency, filter)">
+            </div>
+
+            <div class="cmd-grid" id="commandsList">
+                <!-- Commands will be injected here via JS -->
+                <div class="cmd-card">
+                    <span class="cmd-name">/antinuke enable</span>
+                    <p class="cmd-desc">Activates core perimeter defense protocols to protect against unauthorized raids and malicious bot activity.</p>
+                    <div class="cmd-footer">
+                        <span class="cmd-usage">/antinuke enable</span>
+                        <button class="copy-btn" data-usage="/antinuke enable"><i class="fas fa-copy"></i></button>
+                        <span class="cmd-perm">Admin</span>
+                    </div>
+                </div>
+                <div class="cmd-card">
+                    <span class="cmd-name">/antinuke config</span>
+                    <p class="cmd-desc">Customize security thresholds for automated bans, kicks, and role deletion triggers.</p>
+                    <div class="cmd-footer">
+                        <span class="cmd-usage">/antinuke config</span>
+                        <button class="copy-btn" data-usage="/antinuke config"><i class="fas fa-copy"></i></button>
+                        <span class="cmd-perm">Admin</span>
+                    </div>
+                </div>
+                <div class="cmd-card">
+                    <span class="cmd-name">/whitelist add</span>
+                    <p class="cmd-desc">Grants a trusted user immunity from the antinuke security system.</p>
+                    <div class="cmd-footer">
+                        <span class="cmd-usage">/whitelist &lt;user&gt;</span>
+                        <button class="copy-btn" data-usage="/whitelist <user>"><i class="fas fa-copy"></i></button>
+                        <span class="cmd-perm">Owner</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const commandsData = {
+            hitman: {
+                antinuke: [
+                    { name: "antinuke enable", desc: "Enable the core antinuke protection system.", usage: "$antinuke enable", perm: "Admin" },
+                    { name: "antinuke disable", desc: "Disable the core antinuke protection system.", usage: "$antinuke disable", perm: "Admin" },
+                    { name: "antiwebhook enable", desc: "Protect the server from malicious webhook creation and usage.", usage: "$antiwebhook enable", perm: "Admin" },
+                    { name: "antiwebhook disable", desc: "Turn off webhook creation protection.", usage: "$antiwebhook disable", perm: "Admin" },
+                    { name: "whitelist @user", desc: "Add a trusted user to the whitelist for immunity.", usage: "$whitelist @user", perm: "Owner" },
+                    { name: "unwhitelist @user", desc: "Remove a user from the trusted whitelist.", usage: "$unwhitelist @user", perm: "Owner" },
+                    { name: "whitelisted", desc: "Display a list of all currently whitelisted users.", usage: "$whitelisted", perm: "Admin" },
+                    { name: "whitelist reset", desc: "Wipe all users from the whitelist.", usage: "$whitelist reset", perm: "Owner" },
+                    { name: "extraowner set @user", desc: "Assign an extra owner with elevated permissions.", usage: "$extraowner set @user", perm: "Owner" },
+                    { name: "extraowner view", desc: "Show all current extra owners.", usage: "$extraowner view", perm: "Admin" },
+                    { name: "extraowner reset", desc: "Remove all extra owners.", usage: "$extraowner reset", perm: "Owner" },
+                    { name: "nightmode enable", desc: "Enable nightmode for enhanced security during off-hours.", usage: "$nightmode enable", perm: "Admin" },
+                    { name: "nightmode disable", desc: "Turn off nightmode protection.", usage: "$nightmode disable", perm: "Admin" }
+                ],
+                security: [
+                    { name: "emergency enable", desc: "Activates the emergency response system.", usage: "$emergency enable", perm: "Admin" },
+                    { name: "emergency disable", desc: "Deactivates the emergency response system.", usage: "$emergency disable", perm: "Admin" },
+                    { name: "emergency role add @role", desc: "Add a role to the emergency authorized list.", usage: "$emergency role add @role", perm: "Admin" },
+                    { name: "emergency role remove @role", desc: "Remove a role from the emergency authorized list.", usage: "$emergency role remove @role", perm: "Admin" },
+                    { name: "emergency role list", desc: "List all roles authorized for emergency commands.", usage: "$emergency role list", perm: "Admin" },
+                    { name: "emergency authorise add @user", desc: "Grant emergency authorization to a specific user.", usage: "$emergency authorise add @user", perm: "Owner" },
+                    { name: "emergency authorise remove @user", desc: "Revoke emergency authorization from a user.", usage: "$emergency authorise remove @user", perm: "Owner" },
+                    { name: "emergency authorise list", desc: "Show all users with emergency authorization.", usage: "$emergency authorise list", perm: "Admin" },
+                    { name: "emergency-situation (emgs)", desc: "Trigger an immediate emergency lockdown or protocol.", usage: "$emergency-situation", perm: "Admin" }
+                ],
+                automod: [
+                    { name: "automod", desc: "Base command for the automod system.", usage: "$automod", perm: "Admin" },
+                    { name: "automod enable", desc: "Enable the automod system in the server.", usage: "$automod enable", perm: "Admin" },
+                    { name: "automod disable", desc: "Disable the automod system in the server.", usage: "$automod disable", perm: "Admin" },
+                    { name: "automod punishment", desc: "Configure the punishment for automod violations.", usage: "$automod punishment [kick/ban/mute/warn]", perm: "Admin" },
+                    { name: "automod config", desc: "View the current automod configuration.", usage: "$automod config", perm: "Admin" },
+                    { name: "automod logging", desc: "Set up the logging channel for automod actions.", usage: "$automod logging #channel", perm: "Admin" },
+                    { name: "automod ignore", desc: "Base command for automod ignore settings.", usage: "$automod ignore", perm: "Admin" },
+                    { name: "automod ignore channel", desc: "Add a channel to the automod ignore list.", usage: "$automod ignore channel #channel", perm: "Admin" },
+                    { name: "automod ignore role", desc: "Add a role to the automod ignore list.", usage: "$automod ignore role @role", perm: "Admin" },
+                    { name: "automod ignore show", desc: "Display all ignored channels and roles.", usage: "$automod ignore show", perm: "Admin" },
+                    { name: "automod ignore reset", desc: "Reset all automod ignore settings.", usage: "$automod ignore reset", perm: "Admin" },
+                    { name: "automod unignore", desc: "Remove an ignore setting for a channel or role.", usage: "$automod unignore [id]", perm: "Admin" },
+                    { name: "automod unignore channel", desc: "Remove a channel from the ignore list.", usage: "$automod unignore channel #channel", perm: "Admin" },
+                    { name: "automod unignore role", desc: "Remove a role from the ignore list.", usage: "$automod unignore role @role", perm: "Admin" },
+                    { name: "blacklistword", desc: "Base command for the blacklisted words system.", usage: "$blacklistword", perm: "Admin" },
+                    { name: "blacklistword add", desc: "Add a word to the server's blacklist.", usage: "$blacklistword add [word]", perm: "Admin" },
+                    { name: "blacklistword remove", desc: "Remove a word from the server's blacklist.", usage: "$blacklistword remove [word]", perm: "Admin" },
+                    { name: "blacklistword reset", desc: "Clear all words from the blacklist.", usage: "$blacklistword reset", perm: "Admin" },
+                    { name: "blacklistword config", desc: "View the current blacklist configuration.", usage: "$blacklistword config", perm: "Admin" },
+                    { name: "blacklistword bypass add", desc: "Grant a user or role immunity from the word blacklist.", usage: "$blacklistword bypass add @user/role", perm: "Admin" },
+                    { name: "blacklistword bypass remove", desc: "Remove a bypass for a user or role.", usage: "$blacklistword bypass remove @user/role", perm: "Admin" },
+                    { name: "blacklistword bypass show", desc: "Show all users and roles bypassing the blacklist.", usage: "$blacklistword bypass show", perm: "Admin" }
+                ],
+                servercommands: [
+                    { name: "setup", desc: "Base command for server setup modules.", usage: "$setup", perm: "Admin" },
+                    { name: "setup create <name>", desc: "Create a new server setup configuration.", usage: "$setup create [name]", perm: "Admin" },
+                    { name: "setup delete <name>", desc: "Delete a server setup configuration.", usage: "$setup delete [name]", perm: "Admin" },
+                    { name: "setup list", desc: "View all active setup configurations.", usage: "$setup list", perm: "Admin" },
+                    { name: "setup staff", desc: "Configure the staff role system.", usage: "$setup staff @role", perm: "Admin" },
+                    { name: "setup girl", desc: "Configure the special 'girl' role.", usage: "$setup girl @role", perm: "Admin" },
+                    { name: "setup friend", desc: "Configure the friend role.", usage: "$setup friend @role", perm: "Admin" },
+                    { name: "setup vip", desc: "Configure the VIP role.", usage: "$setup vip @role", perm: "Admin" },
+                    { name: "setup guest", desc: "Configure the guest role.", usage: "$setup guest @role", perm: "Admin" },
+                    { name: "setup config", desc: "View the current setup configuration.", usage: "$setup config", perm: "Admin" },
+                    { name: "setup reset", desc: "Reset all server setup settings.", usage: "$setup reset", perm: "Owner" },
+                    { name: "staff", desc: "Quickly manage staff roles.", usage: "$staff", perm: "Mod" },
+                    { name: "girl", desc: "Quickly manage girl roles.", usage: "$girl", perm: "Mod" },
+                    { name: "friend", desc: "Quickly manage friend roles.", usage: "$friend", perm: "Mod" },
+                    { name: "vip", desc: "Quickly manage VIP roles.", usage: "$vip", perm: "Mod" },
+                    { name: "guest", desc: "Quickly manage guest roles.", usage: "$guest", perm: "Mod" },
+                    { name: "autorole bots add @role", desc: "Add a role to be given automatically to bots.", usage: "$autorole bots add @role", perm: "Admin" },
+                    { name: "autorole bots remove @role", desc: "Remove an autorole from bots.", usage: "$autorole bots remove @role", perm: "Admin" },
+                    { name: "autorole bots", desc: "View current autoroles for bots.", usage: "$autorole bots", perm: "Admin" },
+                    { name: "autorole humans add @role", desc: "Add a role to be given automatically to human members.", usage: "$autorole humans add @role", perm: "Admin" },
+                    { name: "autorole humans remove @role", desc: "Remove an autorole from humans.", usage: "$autorole humans remove @role", perm: "Admin" },
+                    { name: "autorole humans", desc: "View current autoroles for humans.", usage: "$autorole humans", perm: "Admin" },
+                    { name: "autorole config", desc: "View the current autorole configuration.", usage: "$autorole config", perm: "Admin" },
+                    { name: "autorole reset all", desc: "Reset all autorole settings.", usage: "$autorole reset all", perm: "Owner" },
+                    { name: "autorole reset bots", desc: "Reset autoroles for bots.", usage: "$autorole reset bots", perm: "Owner" },
+                    { name: "autorole reset humans", desc: "Reset autoroles for humans.", usage: "$autorole reset humans", perm: "Owner" },
+                    { name: "autorole", desc: "Base command for the autorole system.", usage: "$autorole", perm: "Admin" },
+                    { name: "autoresponder", desc: "Base command for the autoresponder system.", usage: "$autoresponder", perm: "Admin" },
+                    { name: "autoresponder create", desc: "Create a new autoresponder trigger.", usage: "$autoresponder create [trigger] [response]", perm: "Admin" },
+                    { name: "autoresponder delete", desc: "Delete an autoresponder trigger.", usage: "$autoresponder delete [id]", perm: "Admin" },
+                    { name: "autoresponder edit", desc: "Edit an existing autoresponder.", usage: "$autoresponder edit [id] [new response]", perm: "Admin" },
+                    { name: "autoresponder config", desc: "View autoresponder configurations.", usage: "$autoresponder config", perm: "Admin" },
+                    { name: "react", desc: "Base command for auto-reaction management.", usage: "$react", perm: "Admin" },
+                    { name: "react add", desc: "Add an emoji for auto-reaction on new messages.", usage: "$react add [emoji]", perm: "Admin" },
+                    { name: "react remove", desc: "Remove an emoji from auto-reactions.", usage: "$react remove [emoji]", perm: "Admin" },
+                    { name: "react list", desc: "View all active auto-reactions.", usage: "$react list", perm: "Admin" },
+                    { name: "react reset", desc: "Remove all auto-reactions.", usage: "$react reset", perm: "Owner" }
+                ],
+                giveawaycommands: [
+                    { name: "gstart", desc: "Start a new giveaway in the current channel.", usage: "$gstart [time] [winners] [prize]", perm: "Admin" },
+                    { name: "gend", desc: "End an active giveaway immediately.", usage: "$gend [message_id]", perm: "Admin" },
+                    { name: "greroll", desc: "Reroll a winner for a finished giveaway.", usage: "$greroll [message_id]", perm: "Admin" },
+                    { name: "glist", desc: "List all active giveaways in the server.", usage: "$glist", perm: "Admin" }
+                ],
+                ignorecommands: [
+                    { name: "ignore", desc: "Base command for ignore settings.", usage: "$ignore", perm: "Admin" },
+                    { name: "ignore command add", desc: "Add a command to the ignore list.", usage: "$ignore command add [command]", perm: "Admin" },
+                    { name: "ignore command remove", desc: "Remove a command from the ignore list.", usage: "$ignore command remove [command]", perm: "Admin" },
+                    { name: "ignore command show", desc: "Show all ignored commands.", usage: "$ignore command show", perm: "Admin" },
+                    { name: "ignore channel add", desc: "Add a channel to the ignore list.", usage: "$ignore channel add #channel", perm: "Admin" },
+                    { name: "ignore channel remove", desc: "Remove a channel from the ignore list.", usage: "$ignore channel remove #channel", perm: "Admin" },
+                    { name: "ignore channel show", desc: "Show all ignored channels.", usage: "$ignore channel show", perm: "Admin" },
+                    { name: "ignore user add", desc: "Add a user to the ignore list.", usage: "$ignore user add @user", perm: "Admin" },
+                    { name: "ignore user remove", desc: "Remove a user from the ignore list.", usage: "$ignore user remove @user", perm: "Admin" },
+                    { name: "ignore user show", desc: "Show all ignored users.", usage: "$ignore user show", perm: "Admin" },
+                    { name: "ignore bypass add", desc: "Add a user or role to bypass ignore settings.", usage: "$ignore bypass add @user/@role", perm: "Admin" },
+                    { name: "ignore bypass remove", desc: "Remove a user or role from bypass.", usage: "$ignore bypass remove @user/@role", perm: "Admin" },
+                    { name: "ignore bypass show", desc: "Show all users and roles that bypass ignore settings.", usage: "$ignore bypass show", perm: "Admin" }
+                ],
+                voicecommands: [
+                    { name: "voice", desc: "Base command for voice channel management.", usage: "$voice", perm: "Mod" },
+                    { name: "voice kick", desc: "Kick a user from their current voice channel.", usage: "$voice kick @user", perm: "Mod" },
+                    { name: "voice kickall", desc: "Kick all users from the current voice channel.", usage: "$voice kickall", perm: "Admin" },
+                    { name: "voice mute", desc: "Server mute a user in voice.", usage: "$voice mute @user", perm: "Mod" },
+                    { name: "voice muteall", desc: "Server mute everyone in the current voice channel.", usage: "$voice muteall", perm: "Admin" },
+                    { name: "voice unmute", desc: "Server unmute a user in voice.", usage: "$voice unmute @user", perm: "Mod" },
+                    { name: "voice unmuteall", desc: "Server unmute everyone in the current voice channel.", usage: "$voice unmuteall", perm: "Admin" },
+                    { name: "voice deafen", desc: "Server deafen a user in voice.", usage: "$voice deafen @user", perm: "Mod" },
+                    { name: "voice deafenall", desc: "Server deafen everyone in the current voice channel.", usage: "$voice deafenall", perm: "Admin" },
+                    { name: "voice undeafen", desc: "Server undeafen a user in voice.", usage: "$voice undeafen @user", perm: "Mod" },
+                    { name: "voice undeafenall", desc: "Server undeafen everyone in the current voice channel.", usage: "$voice undeafenall", perm: "Admin" },
+                    { name: "voice move", desc: "Move a user to another voice channel.", usage: "$voice move @user #channel", perm: "Mod" },
+                    { name: "voice moveall", desc: "Move all users to another voice channel.", usage: "$voice moveall #channel", perm: "Admin" },
+                    { name: "voice pull", desc: "Pull a user into your current voice channel.", usage: "$voice pull @user", perm: "Mod" },
+                    { name: "voice pullall", desc: "Pull all users from another channel into yours.", usage: "$voice pullall #channel", perm: "Admin" },
+                    { name: "voice lock", desc: "Lock the current voice channel for everyone.", usage: "$voice lock", perm: "Mod" },
+                    { name: "voice unlock", desc: "Unlock the current voice channel.", usage: "$voice unlock", perm: "Mod" },
+                    { name: "voice private", desc: "Make the current voice channel private.", usage: "$voice private", perm: "Mod" },
+                    { name: "voice unprivate", desc: "Remove private status from the current voice channel.", usage: "$voice unprivate", perm: "Mod" },
+                    { name: "vcrole add", desc: "Add a role to be given when a user joins a voice channel.", usage: "$vcrole add @role", perm: "Admin" },
+                    { name: "vcrole remove", desc: "Remove a role from the VC autorole system.", usage: "$vcrole remove @role", perm: "Admin" },
+                    { name: "vcrole config", desc: "View the current VC autorole configuration.", usage: "$vcrole config", perm: "Admin" }
+                ],
+                welcomercommands: [
+                    { name: "greet", desc: "Base command for welcomer management.", usage: "$greet", perm: "Admin" },
+                    { name: "greet setup", desc: "Set up the welcomer system for the server.", usage: "$greet setup", perm: "Admin" },
+                    { name: "greet reset", desc: "Reset and remove the welcomer configuration.", usage: "$greet reset", perm: "Admin" },
+                    { name: "greet channel", desc: "Set the channel for welcome messages.", usage: "$greet channel #channel", perm: "Admin" },
+                    { name: "greet edit", desc: "Edit the welcome message or embed.", usage: "$greet edit", perm: "Admin" },
+                    { name: "greet test", desc: "Send a test welcome message to the current channel.", usage: "$greet test", perm: "Admin" },
+                    { name: "greet config", desc: "View the current welcomer configuration.", usage: "$greet config", perm: "Admin" },
+                    { name: "greet autodeletete", desc: "Set the auto-delete time for welcome messages.", usage: "$greet autodeletete [seconds]", perm: "Admin" }
+                ],
+                aichat: [
+                    { name: "aichat setup", desc: "Set up the AI Chat system in a specific channel.", usage: "$aichat setup #channel", perm: "Admin" },
+                    { name: "aichat reset", desc: "Reset and remove the AI Chat configuration.", usage: "$aichat reset", perm: "Admin" },
+                    { name: "aichat disable", desc: "Disable the AI Chat system in the server.", usage: "$aichat disable", perm: "Admin" },
+                    { name: "aichat enable", desc: "Enable the AI Chat system in the server.", usage: "$aichat enable", perm: "Admin" }
+                ],
+                jail: [
+                    { name: "jailsetup", desc: "Set up the jail system and create the jail role.", usage: "$jailsetup", perm: "Admin" },
+                    { name: "jailpanel", desc: "Send an interactive panel to manage jailed users.", usage: "$jailpanel", perm: "Admin" },
+                    { name: "jail", desc: "Jail a user, restricting their access to the server.", usage: "$jail @user [reason]", perm: "Mod" },
+                    { name: "unjail", desc: "Release a user from jail.", usage: "$unjail @user", perm: "Mod" },
+                    { name: "jaillist", desc: "View a list of all currently jailed users.", usage: "$jaillist", perm: "Mod" },
+                    { name: "jailreset", desc: "Reset the jail system and remove configurations.", usage: "$jailreset", perm: "Admin" }
+                ],
+                marry: [
+                    { name: "marry", desc: "Propose marriage to another user.", usage: "$marry @user", perm: "User" },
+                    { name: "marry setup", desc: "Set up the marriage system for the server.", usage: "$marry setup", perm: "Admin" },
+                    { name: "marry status", desc: "Check your current marriage status or someone else's.", usage: "$marry status [@user]", perm: "User" },
+                    { name: "marry divorce", desc: "Divorce your current partner.", usage: "$marry divorce", perm: "User" },
+                    { name: "marry list", desc: "View a list of all married couples in the server.", usage: "$marry list", perm: "User" },
+                    { name: "marry bio", desc: "Set a custom biography for your marriage profile.", usage: "$marry bio [text]", perm: "User" },
+                    { name: "marry looking", desc: "Toggle your status as looking for a partner.", usage: "$marry looking", perm: "User" }
+                ],
+                j2ccommands: [
+                    { name: "j2csetup", desc: "Set up the Join-to-Create voice channel system.", usage: "$j2csetup", perm: "Admin" },
+                    { name: "j2creset", desc: "Reset and remove the Join-to-Create configuration.", usage: "$j2creset", perm: "Admin" }
+                ],
+                mediacommands: [
+                    { name: "media", desc: "Base command for media management.", usage: "$media", perm: "Admin" },
+                    { name: "media setup", desc: "Configure media-only channels in your server.", usage: "$media setup #channel", perm: "Admin" },
+                    { name: "media remove", desc: "Remove a channel from the media-only list.", usage: "$media remove #channel", perm: "Admin" },
+                    { name: "media config", desc: "View the current media channel configuration.", usage: "$media config", perm: "Admin" },
+                    { name: "media bypass", desc: "Manage media bypass permissions.", usage: "$media bypass", perm: "Admin" },
+                    { name: "media bypass add", desc: "Add a user or role to bypass media-only restrictions.", usage: "$media bypass add @user/@role", perm: "Admin" },
+                    { name: "media bypass remove", desc: "Remove a user or role from media bypass.", usage: "$media bypass remove @user/@role", perm: "Admin" },
+                    { name: "media bypass show", desc: "Show all users and roles that can bypass media restrictions.", usage: "$media bypass show", perm: "Admin" }
+                ],
+                generalcommands: [
+                    { name: "status", desc: "Check the bot's current status and latency.", usage: "$status", perm: "User" },
+                    { name: "afk", desc: "Set an AFK status to be displayed when mentioned.", usage: "$afk [reason]", perm: "User" },
+                    { name: "avatar", desc: "View a user's profile picture.", usage: "$avatar @user", perm: "User" },
+                    { name: "banner", desc: "View a user's profile banner.", usage: "$banner @user", perm: "User" },
+                    { name: "servericon", desc: "View the server's icon.", usage: "$servericon", perm: "User" },
+                    { name: "membercount", desc: "See the total number of members in the server.", usage: "$membercount", perm: "User" },
+                    { name: "poll", desc: "Create a simple reaction-based poll.", usage: "$poll [question]", perm: "Mod" },
+                    { name: "hack", desc: "A fun simulated hack command.", usage: "$hack @user", perm: "User" },
+                    { name: "token", desc: "Simulate getting a user's token (fun only).", usage: "$token @user", perm: "User" },
+                    { name: "users", desc: "See the total number of users across all shards.", usage: "$users", perm: "User" },
+                    { name: "wizz", desc: "A fun simulated 'wizzing' command.", usage: "$wizz", perm: "User" },
+                    { name: "urban", desc: "Search for a term on Urban Dictionary.", usage: "$urban [word]", perm: "User" },
+                    { name: "rickroll", desc: "Send a rickroll link to a user.", usage: "$rickroll @user", perm: "User" },
+                    { name: "hash", desc: "Convert text to a hash (SHA256).", usage: "$hash [text]", perm: "User" },
+                    { name: "snipe", desc: "Retrieve the last deleted message in the channel.", usage: "$snipe", perm: "Mod" },
+                    { name: "list boosters", desc: "List all server boosters.", usage: "$list boosters", perm: "User" },
+                    { name: "list inrole", desc: "List all users with a specific role.", usage: "$list inrole @role", perm: "Mod" },
+                    { name: "list emojis", desc: "List all server emojis.", usage: "$list emojis", perm: "User" },
+                    { name: "list bots", desc: "List all bots in the server.", usage: "$list bots", perm: "User" },
+                    { name: "list admins", desc: "List all users with Administrator permission.", usage: "$list admins", perm: "User" },
+                    { name: "list invoice", desc: "List all active invoices.", usage: "$list invoice", perm: "Admin" },
+                    { name: "list mods", desc: "List all server moderators.", usage: "$list mods", perm: "User" },
+                    { name: "list early", desc: "List all early supporters.", usage: "$list early", perm: "User" },
+                    { name: "list activedeveloper", desc: "List users with Active Developer badge.", usage: "$list activedeveloper", perm: "User" },
+                    { name: "list createpos", desc: "List users by account creation position.", usage: "$list createpos", perm: "User" },
+                    { name: "list roles", desc: "List all roles in the server.", usage: "$list roles", perm: "User" }
+                ],
+                music: [
+                    { name: "play", desc: "Play a song from YouTube, Spotify, or SoundCloud.", usage: "$play [song_name/url]", perm: "User" },
+                    { name: "search", desc: "Search for a song and pick from results.", usage: "$search [query]", perm: "User" },
+                    { name: "loop", desc: "Toggle loop for the current song or queue.", usage: "$loop [off/song/queue]", perm: "User" },
+                    { name: "autoplay", desc: "Automatically play related songs after the queue ends.", usage: "$autoplay", perm: "User" },
+                    { name: "nowplaying", desc: "Show information about the song currently playing.", usage: "$nowplaying", perm: "User" },
+                    { name: "shuffle", desc: "Shuffle the songs in the current queue.", usage: "$shuffle", perm: "User" },
+                    { name: "stop", desc: "Stop the music and clear the queue.", usage: "$stop", perm: "User" },
+                    { name: "skip", desc: "Skip the current song.", usage: "$skip", perm: "User" },
+                    { name: "seek", desc: "Jump to a specific time in the song.", usage: "$seek [time]", perm: "User" },
+                    { name: "join", desc: "Make the bot join your voice channel.", usage: "$join", perm: "User" },
+                    { name: "disconnect", desc: "Make the bot leave the voice channel.", usage: "$disconnect", perm: "User" },
+                    { name: "replay", desc: "Restart the current song from the beginning.", usage: "$replay", perm: "User" },
+                    { name: "queue", desc: "View all songs currently in the queue.", usage: "$queue", perm: "User" },
+                    { name: "clearqueue", desc: "Remove all songs from the queue.", usage: "$clearqueue", perm: "User" },
+                    { name: "pause", desc: "Pause the current music playback.", usage: "$pause", perm: "User" },
+                    { name: "resume", desc: "Resume the paused music playback.", usage: "$resume", perm: "User" },
+                    { name: "volume", desc: "Adjust the music volume level.", usage: "$volume [0-150]", perm: "User" },
+                    { name: "filter", desc: "Apply audio filters to the music.", usage: "$filter [filter_name]", perm: "User" },
+                    { name: "filter enable", desc: "Enable a specific audio filter.", usage: "$filter enable [filter_name]", perm: "User" },
+                    { name: "filter disable", desc: "Disable all active audio filters.", usage: "$filter disable", perm: "User" }
+                ],
+                moderation: [
+                    { name: "audit", desc: "View the server audit logs.", usage: "$audit", perm: "Admin" },
+                    { name: "warn", desc: "Issue a warning to a user.", usage: "$warn @user [reason]", perm: "Mod" },
+                    { name: "clearwarns", desc: "Clear all warnings from a user.", usage: "$clearwarns @user", perm: "Admin" },
+                    { name: "ban", desc: "Permanently ban a user from the server.", usage: "$ban @user [reason]", perm: "Mod" },
+                    { name: "unban", desc: "Revoke a user's ban.", usage: "$unban [userID]", perm: "Mod" },
+                    { name: "kick", desc: "Kick a user from the server.", usage: "$kick @user [reason]", perm: "Mod" },
+                    { name: "mute", desc: "Silence a user in text and voice channels.", usage: "$mute @user [duration]", perm: "Mod" },
+                    { name: "nick", desc: "Change a user's nickname.", usage: "$nick @user [new name]", perm: "Mod" },
+                    { name: "nuke", desc: "Deletes and recreates a channel to clear all messages.", usage: "$nuke", perm: "Admin" },
+                    { name: "clone", desc: "Clone a specific channel.", usage: "$clone", perm: "Admin" },
+                    { name: "snipe", desc: "Retrieve the last deleted message in the channel.", usage: "$snipe", perm: "Mod" },
+                    { name: "hide", desc: "Hide the current channel from users.", usage: "$hide", perm: "Mod" },
+                    { name: "unhide", desc: "Make a hidden channel visible again.", usage: "$unhide", perm: "Mod" },
+                    { name: "hideall", desc: "Hide all channels in the server.", usage: "$hideall", perm: "Admin" },
+                    { name: "unhideall", desc: "Unhide all channels in the server.", usage: "$unhideall", perm: "Admin" },
+                    { name: "lock", desc: "Lock the current channel to prevent messaging.", usage: "$lock", perm: "Mod" },
+                    { name: "unlock", desc: "Unlock a locked channel.", usage: "$unlock", perm: "Mod" },
+                    { name: "lockall", desc: "Lock all channels in the server.", usage: "$lockall", perm: "Admin" },
+                    { name: "unlockall", desc: "Unlock all channels in the server.", usage: "$unlockall", perm: "Admin" },
+                    { name: "slowmode", desc: "Set a message cooldown for the channel.", usage: "$slowmode [time]", perm: "Mod" },
+                    { name: "unslowmode", desc: "Remove slowmode from the channel.", usage: "$unslowmode", perm: "Mod" },
+                    { name: "role", desc: "General role management command.", usage: "$role @user @role", perm: "Mod" },
+                    { name: "role all", desc: "Give a role to every member in the server.", usage: "$role all @role", perm: "Admin" },
+                    { name: "role humans", desc: "Give a role to all human members.", usage: "$role humans @role", perm: "Admin" },
+                    { name: "role bots", desc: "Give a role to all bots in the server.", usage: "$role bots @role", perm: "Admin" },
+                    { name: "removerole all", desc: "Remove a role from everyone.", usage: "$removerole all @role", perm: "Admin" },
+                    { name: "removerole humans", desc: "Remove a role from all humans.", usage: "$removerole humans @role", perm: "Admin" },
+                    { name: "removerole bots", desc: "Remove a role from all bots.", usage: "$removerole bots @role", perm: "Admin" },
+                    { name: "role create", desc: "Create a new role with a specified name.", usage: "$role create [name]", perm: "Admin" },
+                    { name: "role delete", desc: "Delete an existing role.", usage: "$role delete @role", perm: "Admin" },
+                    { name: "role rename", desc: "Rename an existing role.", usage: "$role rename @role [new name]", perm: "Admin" },
+                    { name: "role icon", desc: "Set or change a role's icon.", usage: "$role icon @role [emoji]", perm: "Admin" },
+                    { name: "role temp", desc: "Give a temporary role to a user.", usage: "$role temp @user @role [time]", perm: "Admin" },
+                    { name: "role unverified", desc: "Manage roles for unverified members.", usage: "$role unverified @role", perm: "Admin" },
+                    { name: "removerole unverified", desc: "Remove roles from unverified members.", usage: "$removerole unverified @role", perm: "Admin" },
+                    { name: "clear", desc: "Clear a specific number of messages.", usage: "$clear [count]", perm: "Mod" },
+                    { name: "clear all", desc: "Wipe all messages in the channel.", usage: "$clear all", perm: "Admin" },
+                    { name: "clear bots", desc: "Clear only messages sent by bots.", usage: "$clear bots [count]", perm: "Mod" },
+                    { name: "clear user", desc: "Clear messages from a specific user.", usage: "$clear user @user [count]", perm: "Mod" },
+                    { name: "clear contains", desc: "Clear messages containing specific text.", usage: "$clear contains [text] [count]", perm: "Mod" },
+                    { name: "clear embeds", desc: "Clear messages containing embeds.", usage: "$clear embeds [count]", perm: "Mod" },
+                    { name: "clear files", desc: "Clear messages with file attachments.", usage: "$clear files [count]", perm: "Mod" },
+                    { name: "clear images", desc: "Clear messages with images.", usage: "$clear images [count]", perm: "Mod" },
+                    { name: "clear mentions", desc: "Clear messages that contain mentions.", usage: "$clear mentions [count]", perm: "Mod" },
+                    { name: "clear reactions", desc: "Clear all reactions from messages.", usage: "$clear reactions [count]", perm: "Mod" },
+                    { name: "steal", desc: "Steal an emoji from another server.", usage: "$steal [emoji]", perm: "Admin" },
+                    { name: "deleteemoji", desc: "Delete a custom emoji from the server.", usage: "$deleteemoji [emoji]", perm: "Admin" },
+                    { name: "deletesticker", desc: "Delete a sticker from the server.", usage: "$deletesticker [sticker]", perm: "Admin" },
+                    { name: "enlarge", desc: "Enlarge a custom emoji or sticker.", usage: "$enlarge [emoji/sticker]", perm: "User" },
+                    { name: "topcheck enable", desc: "Enable the topcheck monitoring system.", usage: "$topcheck enable", perm: "Admin" },
+                    { name: "topcheck disable", desc: "Disable the topcheck monitoring system.", usage: "$topcheck disable", perm: "Admin" },
+                    { name: "topcheck", desc: "View the status of topcheck monitoring.", usage: "$topcheck", perm: "Admin" }
+                ],
+                fun: [
+                    { name: "imagine", desc: "Generate an AI image based on your prompt.", usage: "/imagine [prompt]", perm: "User" },
+                    { name: "ship", desc: "Check the compatibility between two users.", usage: "$ship @user1 @user2", perm: "User" },
+                    { name: "mydog", desc: "Show a random cute dog picture.", usage: "$mydog", perm: "User" },
+                    { name: "chat", desc: "Start an AI-powered conversation.", usage: "$chat [message]", perm: "User" },
+                    { name: "translate", desc: "Translate text to a specified language.", usage: "$translate [target_lang] [text]", perm: "User" },
+                    { name: "howgay", desc: "A fun meter to check how gay someone is.", usage: "$howgay @user", perm: "User" },
+                    { name: "lesbian", desc: "A fun meter to check how lesbian someone is.", usage: "$lesbian @user", perm: "User" },
+                    { name: "cute", desc: "Check how cute a user is.", usage: "$cute @user", perm: "User" },
+                    { name: "intelligence", desc: "Measure a user's simulated intelligence level.", usage: "$intelligence @user", perm: "User" },
+                    { name: "chutiya", desc: "A fun meter for the 'chutiya' level.", usage: "$chutiya @user", perm: "User" },
+                    { name: "horny", desc: "Measure a user's simulated horny level.", usage: "$horny @user", perm: "User" },
+                    { name: "tharki", desc: "Measure a user's simulated tharki level.", usage: "$tharki @user", perm: "User" },
+                    { name: "gif", desc: "Search and send a GIF.", usage: "$gif [search_term]", perm: "User" },
+                    { name: "iplookup", desc: "Simulate an IP lookup for fun.", usage: "$iplookup [ip]", perm: "User" },
+                    { name: "weather", desc: "Check the weather for a specific city.", usage: "$weather [city]", perm: "User" },
+                    { name: "hug", desc: "Give someone a virtual hug.", usage: "$hug @user", perm: "User" },
+                    { name: "kiss", desc: "Give someone a virtual kiss.", usage: "$kiss @user", perm: "User" },
+                    { name: "pat", desc: "Give someone a gentle pat.", usage: "$pat @user", perm: "User" },
+                    { name: "cuddle", desc: "Cuddle with another user virtually.", usage: "$cuddle @user", perm: "User" },
+                    { name: "slap", desc: "Give someone a virtual slap.", usage: "$slap @user", perm: "User" },
+                    { name: "tickle", desc: "Tickle someone virtually.", usage: "$tickle @user", perm: "User" },
+                    { name: "spank", desc: "Give someone a virtual spank.", usage: "$spank @user", perm: "User" },
+                    { name: "ngif", desc: "Send a random anime-style GIF.", usage: "$ngif", perm: "User" },
+                    { name: "8ball", desc: "Ask the magic 8-ball a question.", usage: "$8ball [question]", perm: "User" },
+                    { name: "truth", desc: "Get a 'Truth' question for the game.", usage: "$truth", perm: "User" },
+                    { name: "dare", desc: "Get a 'Dare' task for the game.", usage: "$dare", perm: "User" },
+                    { name: "dark", desc: "Measure a user's simulated dark level.", usage: "$dark", perm: "User" },
+                    { name: "roast", desc: "Roast another user with a witty comment.", usage: "$roast @user", perm: "User" },
+                    { name: "blackjack", desc: "Play a game of Blackjack against the bot.", usage: "$blackjack [bet]", perm: "User" },
+                    { name: "chess", desc: "Start a game of Chess with another user.", usage: "$chess @user", perm: "User" },
+                    { name: "tic-tac-toe", desc: "Play Tic-Tac-Toe against another user.", usage: "$tic-tac-toe @user", perm: "User" },
+                    { name: "country-guesser", desc: "Guess the country based on its flag or map.", usage: "$country-guesser", perm: "User" },
+                    { name: "rps", desc: "Play Rock Paper Scissors against the bot.", usage: "$rps [rock/paper/scissors]", perm: "User" },
+                    { name: "lights-out", desc: "Play the Lights Out puzzle game.", usage: "$lights-out", perm: "User" },
+                    { name: "wordle", desc: "Play the Wordle word guessing game.", usage: "$wordle", perm: "User" },
+                    { name: "2048", desc: "Play the classic 2048 tile game.", usage: "$2048", perm: "User" },
+                    { name: "memory-game", desc: "Test your memory with this matching game.", usage: "$memory-game", perm: "User" },
+                    { name: "number-slider", desc: "Solve the sliding number puzzle.", usage: "$number-slider", perm: "User" },
+                    { name: "battleship", desc: "Play Battleship against another user.", usage: "$battleship @user", perm: "User" },
+                    { name: "connect-four", desc: "Play Connect Four against another user.", usage: "$connect-four @user", perm: "User" },
+                    { name: "slots", desc: "Try your luck at the slot machine.", usage: "$slots [bet]", perm: "User" },
+                    { name: "guess-number", desc: "Guess the number the bot is thinking of.", usage: "$guess-number", perm: "User" },
+                    { name: "coin-flip", desc: "Flip a coin for heads or tails.", usage: "$coin-flip", perm: "User" },
+                    { name: "roll-dice", desc: "Roll a six-sided die.", usage: "$roll-dice", perm: "User" }
+                ],
+                utilities: [
+                    { name: "botinfo", desc: "View detailed information about the bot.", usage: "$botinfo", perm: "User" },
+                    { name: "stats", desc: "Show bot statistics including shards and guilds.", usage: "$stats", perm: "User" },
+                    { name: "invite", desc: "Get the bot's invite link.", usage: "$invite", perm: "User" },
+                    { name: "serverinfo", desc: "Display information about the current server.", usage: "$serverinfo", perm: "User" },
+                    { name: "userinfo", desc: "Show detailed information about a user.", usage: "$userinfo @user", perm: "User" },
+                    { name: "roleinfo", desc: "Display information about a specific role.", usage: "$roleinfo @role", perm: "User" },
+                    { name: "boostcount", desc: "Check the current number of server boosts.", usage: "$boostcount", perm: "User" },
+                    { name: "unbanall", desc: "Unban every user from the server's ban list.", usage: "$unbanall", perm: "Owner" },
+                    { name: "joined-at", desc: "Check when a user joined the server.", usage: "$joined-at @user", perm: "User" },
+                    { name: "ping", desc: "Check the bot's response latency.", usage: "$ping", perm: "User" },
+                    { name: "github", desc: "search to Get the link  GitHub repository.", usage: "$github", perm: "User" },
+                    { name: "vcinfo", desc: "Display information about a voice channel.", usage: "$vcinfo [channel_id]", perm: "User" },
+                    { name: "channelinfo", desc: "Show information about a text or category channel.", usage: "$channelinfo #channel", perm: "User" },
+                    { name: "badges", desc: "List a user's Discord badges.", usage: "$badges @user", perm: "User" },
+                    { name: "banner user", desc: "View a user's profile banner.", usage: "$banner user @user", perm: "User" },
+                    { name: "banner server", desc: "View the server's banner image.", usage: "$banner server", perm: "User" },
+                    { name: "reminder start", desc: "Start a new reminder.", usage: "$reminder start [time] [reason]", perm: "User" },
+                    { name: "reminder clear", desc: "Clear all your active reminders.", usage: "$reminder clear", perm: "User" },
+                    { name: "permissions", desc: "View a user's permissions in the current channel.", usage: "$permissions @user", perm: "User" },
+                    { name: "timer", desc: "Start a countdown timer.", usage: "$timer [time]", perm: "User" }
+                ]
+            },
+            agxz: {
+                antinuke: [], security: [], automod: [], servercommands: [], giveawaycommands: [], ignorecommands: [], welcomercommands: [], aichat: [], jail: [], marry: [], voicecommands: [], j2ccommands: [], mediacommands: [], generalcommands: [], music: [], moderation: [], boosterroles: [], fun: [], utilities: []
+            },
+            monix: {
+                economy: [
+                    { name: "bal", desc: "Check your current Nix Coin balance.", usage: ".bal [@user]", perm: "User" },
+                    { name: "coinflip", desc: "Bet your Nix Coins on a coin flip.", usage: ".coinflip [amount] [heads/tails]", perm: "User" },
+                    { name: "daily", desc: "Claim your daily allowance of Nix Coins.", usage: ".daily", perm: "User" },
+                    { name: "leaderboard", desc: "View the top wealthiest users in the server.", usage: ".leaderboard", perm: "User" },
+                    { name: "pay", desc: "Transfer Nix Coins to another user.", usage: ".pay @user [amount]", perm: "User" },
+                    { name: "shop", desc: "Browse and buy items from the server shop.", usage: ".shop", perm: "User" }
+                ],
+                utilities: [
+                    { name: "help", desc: "Get a list of all available commands for Monix.", usage: ".help", perm: "User" },
+                    { name: "invite", desc: "Get the invite link for Monix bot.", usage: ".invite", perm: "User" },
+                    { name: "ping", desc: "Check the bot's connection latency.", usage: ".ping", perm: "User" },
+                    { name: "prefix", desc: "Show the current command prefix.", usage: ".prefix", perm: "User" },
+                    { name: "setprefix", desc: "Change the command prefix for your server.", usage: ".setprefix [new_prefix]", perm: "Admin" },
+                    { name: "uptime", desc: "Check how long the bot has been online.", usage: ".uptime", perm: "User" }
+                ],
+                antinuke: [], security: [], automod: [], servercommands: [], giveawaycommands: [], ignorecommands: [], welcomercommands: [], aichat: [], jail: [], marry: [], voicecommands: [], j2ccommands: [], mediacommands: [], generalcommands: [], music: [], moderation: [], boosterroles: [], fun: []
+            }
+        };
+
+        const proNames = new Set([
+            "antiwebhook enable",
+            "emergency enable",
+            "emergency role add @role",
+            "nightmode enable",
+            "automod punishment",
+            "filter",
+            "filter enable",
+            "unbanall",
+            "jailpanel",
+            "jailsetup",
+            "jail",
+            "unjail",
+            "jaillist",
+            "jailreset",
+            "imagine"
+        ]);
+
+        let currentBot = 'hitman';
+        let currentCategory = 'antinuke';
+        let searchTerm = '';
+        let showProOnly = false;
+
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentBot = urlParams.get('bot') || 'hitman';
+            switchBot(currentBot);
+            setupCategoryListeners();
+            setupSearchListener();
+            const proToggle = document.getElementById('proToggle');
+            proToggle.addEventListener('click', () => {
+                showProOnly = !showProOnly;
+                proToggle.classList.toggle('active', showProOnly);
+                renderCommands();
+            });
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.copy-btn');
+                if (btn) {
+                    const txt = btn.getAttribute('data-usage') || '';
+                    navigator.clipboard.writeText(txt);
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i>'; }, 1200);
+                }
+            });
+        };
+
+        function switchBot(bot) {
+            currentBot = bot;
+            const selector = document.querySelector('.bot-selector');
+            selector.setAttribute('data-bot', bot);
+            
+            const tabs = document.querySelectorAll('.bot-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const activeTab = document.querySelector(`.bot-tab.${bot}`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+            
+            // Sync AGXZ data if empty or forced (for prefix change)
+            if (bot === 'agxz') {
+                Object.keys(commandsData.hitman).forEach(category => {
+                    commandsData.agxz[category] = commandsData.hitman[category].map(cmd => ({
+                        ...cmd,
+                        usage: cmd.usage.replace(/\$/g, '?')
+                    }));
+                });
+            }
+
+            // Update category visibility based on bot
+            const categoryItems = document.querySelectorAll('.category-item');
+            categoryItems.forEach(item => {
+                const categoryText = item.innerText.trim();
+                if (bot === 'monix') {
+                    if (categoryText === 'Economy') {
+                        item.style.display = 'flex';
+                        item.click(); // Auto-select Economy for Monix
+                    } else {
+                        item.style.display = 'none';
+                    }
+                } else if (bot === 'hitman' || bot === 'agxz') {
+                    if (categoryText === 'Economy') {
+                        item.style.display = 'none';
+                        if (currentCategory === 'economy') {
+                            categoryItems[0].click(); // Select Antinuke if Economy was active
+                        }
+                    } else {
+                        item.style.display = 'flex';
+                    }
+                } else {
+                    item.style.display = 'flex';
+                }
+            });
+
+            const header = document.querySelector('.cmd-header h1');
+            header.innerText = `${bot.toUpperCase()} Commands`;
+            renderCommands();
+        }
+
+        function setupSearchListener() {
+            const searchInput = document.querySelector('.search-box input');
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase();
+                renderCommands();
+            });
+        }
+
+        function setupCategoryListeners() {
+            const items = document.querySelectorAll('.category-item');
+            items.forEach(item => {
+                item.addEventListener('click', () => {
+                    items.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    // Remove all spaces and special characters for a clean key
+                    currentCategory = item.innerText.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    renderCommands();
+                });
+            });
+        }
+
+        function renderCommands() {
+            const list = document.getElementById('commandsList');
+            list.innerHTML = '';
+            
+            let commands = [];
+            
+            if (searchTerm) {
+                // Global search across all categories for the current bot
+                Object.values(commandsData[currentBot]).forEach(catCmds => {
+                    commands = commands.concat(catCmds);
+                });
+                
+                commands = commands.filter(cmd => 
+                    cmd.name.toLowerCase().includes(searchTerm) || 
+                    cmd.desc.toLowerCase().includes(searchTerm) ||
+                    cmd.usage.toLowerCase().includes(searchTerm)
+                );
+            } else {
+                // Category-specific view
+                const categoryKey = currentCategory === 'fungames' ? 'fun' : 
+                                    currentCategory === 'jailcommands' ? 'jail' :
+                                    currentCategory === 'marrycommands' ? 'marry' :
+                                    currentCategory;
+                commands = commandsData[currentBot][categoryKey] || [];
+            }
+
+            if (showProOnly) {
+                commands = commands.filter(c => proNames.has(c.name));
+            }
+            
+            const header = document.querySelector('.cmd-header h1');
+            const subheader = document.querySelector('.cmd-header p');
+            
+            if (searchTerm) {
+                header.innerText = `Search Results`;
+                subheader.innerText = `Found ${commands.length} commands matching "${searchTerm}"`;
+            } else {
+                header.innerText = `${currentBot.toUpperCase()} Commands`;
+                subheader.innerText = `Browse and search through all available bot modules.`;
+            }
+
+            if (commands.length === 0) {
+                list.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
+                    ${searchTerm ? `No commands matching "${searchTerm}" found.` : 'No commands found for this category yet.'}
+                </div>`;
+                return;
+            }
+
+            commands.forEach((cmd, index) => {
+                const card = document.createElement('div');
+                const isPro = proNames.has(cmd.name);
+                card.className = 'cmd-card' + (isPro ? ' pro' : '') + ' animate__animated animate__fadeInUp';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.innerHTML = `
+                    ${isPro ? '<div class="badge-pro">PRO</div>' : ''}
+                    <span class="cmd-name">${cmd.name}</span>
+                    <p class="cmd-desc">${cmd.desc}</p>
+                    <div class="cmd-footer">
+                        <span class="cmd-usage">${cmd.usage}</span>
+                        <button class="copy-btn" data-usage="${cmd.usage}"><i class="fas fa-copy"></i></button>
+                        <span class="cmd-perm">${cmd.perm}</span>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

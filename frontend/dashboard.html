@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Agency Development</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script>try{localStorage.setItem('has_dashboard','1')}catch(e){}</script>
+    <script src="clean-urls.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-width: 220px;
+            --sidebar-collapsed-width: 64px;
+        }
+        
+        body {
+            background-color: var(--bg-black);
+            color: var(--text-pure);
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .logout-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border-radius: 999px;
+            background: #ff3333;
+            color: #fff;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-left: 10px;
+        }
+        .logout-badge i { width: 16px; }
+        .logout-badge:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 51, 51, 0.25);
+        }
+        #logout-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .logout-card {
+            width: 360px;
+            background: rgba(12,12,12,0.95);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 18px 20px;
+            color: #fff;
+        }
+        .logout-card h3 {
+            margin: 0 0 10px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        .logout-card p {
+            margin: 0 0 16px;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+        }
+        .logout-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-danger {
+            background: #ff3333;
+            color: #fff;
+        }
+        .btn-danger:hover { background: #fff; color: #000; }
+        .dashboard-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(8, 8, 8, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sidebar-logo {
+            font-weight: 900;
+            font-size: 1.2rem;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .sidebar-logo span { color: var(--accent-red); }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 0.8rem 0.6rem;
+            overflow-y: auto;
+        }
+
+        .menu-label {
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin: 0.4rem 0 0.6rem 0.8rem;
+            letter-spacing: 1.2px;
+            opacity: 0.8;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem 0.7rem;
+            border-radius: 12px;
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: var(--transition);
+            margin-bottom: 0.3rem;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            font-size: 0.9rem;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            color: #fff;
+            background: linear-gradient(180deg, rgba(255,51,51,0.12), rgba(255,51,51,0.06));
+            border-color: rgba(255, 51, 51, 0.28);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 6px 16px rgba(255,51,51,0.08);
+        }
+        .menu-item.active::before {
+            content: '';
+            width: 6px;
+            height: 70%;
+            border-radius: 3px;
+            background: var(--accent-red);
+            margin-right: 6px;
+        }
+
+        .menu-item i { width: 18px; font-size: 1rem; opacity: 0.9; }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        /* Main Content */
+        .main-stage {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: radial-gradient(circle at top right, rgba(255, 51, 51, 0.03), transparent);
+        }
+
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 0.8rem;
+        }
+        .empty-state {
+            grid-column: 1/-1;
+            background: var(--bg-dark);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+        }
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,51,51,0.12);
+            border: 1px solid var(--accent-red-glow);
+            color: var(--accent-red);
+            font-size: 28px;
+        }
+        .empty-title {
+            font-weight: 900;
+            font-size: 1.4rem;
+            margin-bottom: 0.25rem;
+        }
+        .empty-subtitle {
+            color: var(--text-gray);
+            margin-bottom: 1.2rem;
+        }
+        .empty-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-pill {
+            border-radius: 999px;
+            padding: 10px 18px;
+            font-weight: 800;
+        }
+        .helper-text {
+            color: var(--text-gray);
+        }
+
+        .server-card {
+            background: var(--bg-dark);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .server-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-red);
+            box-shadow: 0 10px 30px rgba(255, 51, 51, 0.1);
+        }
+
+        .server-banner {
+            height: 64px;
+            width: 100%;
+            background: linear-gradient(45deg, #1a1a1a, #0a0a0a);
+        }
+
+        .server-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #111;
+            position: absolute;
+            top: 40px;
+            left: 16px;
+            border: 3px solid var(--bg-dark);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .server-body {
+            padding: 40px 16px 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .server-name {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .server-meta {
+            margin-bottom: 1.5rem;
+        }
+
+        .server-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--accent-red);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-profile-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-dark);
+            padding: 6px 16px 6px 6px;
+            border-radius: 100px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .user-profile-nav img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        /* Module Panels */
+        .config-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .card-title i { color: var(--accent-red); }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .control-item {
+            background: rgba(255,255,255,0.02);
+            padding: 0.9rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .control-item label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.6rem;
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            border-color: var(--accent-red);
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--accent-red); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Status Badge */
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+        /* Hidden Utility */
+        .hidden { display: none !important; }
+
+        @media (max-width: 1024px) {
+            .sidebar { width: var(--sidebar-collapsed-width); }
+            .sidebar-logo, .menu-item span, .menu-label { display: none; }
+            .sidebar-header { justify-content: center; padding: 1.2rem 0; }
+        }
+        .stat-label{font-size:.8rem;color:var(--text-gray)}
+        .stat-value{font-size:1.1rem;font-weight:800}
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="home.html" class="sidebar-logo">AGENCY<span>DEV</span></a>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-label">Main</div>
+                <a href="home.html" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home Page</span>
+                </a>
+                <div class="menu-item active" onclick="showTab('servers')">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item" onclick="showTab('logging')">
+                    <i class="fas fa-bug"></i>
+                    <span>Bug Menu</span>
+                </div>
+
+                <div id="module-tabs" class="hidden">
+                    <div class="menu-label">Server Modules</div>
+                    <div class="menu-item" onclick="showTab('moderation')">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Moderation</span>
+                    </div>
+                    <div class="menu-item" onclick="showTab('automod')">
+                        <i class="fas fa-robot"></i>
+                        <span>Auto Mod</span>
+                    </div>
+                    <div class="menu-item" onclick="showTab('antinuke')">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Anti Nuke</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer" id="sidebar-user">
+                <!-- User avatar will be injected here -->
+            </div>
+        </aside>
+
+        <!-- Main Stage -->
+        <main class="main-stage">
+            
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div id="page-header">
+                    <h1 style="font-size: 1.6rem; font-weight: 900; letter-spacing: -1px; display:flex; align-items:center; gap:8px;">
+                        Dashboard
+                        <span style="font-size:0.72rem; font-weight:900; letter-spacing:.6px; padding:3px 8px; border-radius:999px; color: var(--accent-red); background: rgba(255,51,51,0.12); border:1px solid rgba(255,51,51,0.28); vertical-align:middle;">BETA</span>
+                    </h1>
+                    <p style="color: var(--text-gray); font-size: 0.9rem;">Welcome back to your control center. Found a bug? <a href="#" onclick="showTab('logging'); openBugModal && openBugModal();" style="color: var(--accent-red); text-decoration:none; font-weight:800;">Report it</a>.</p>
+                </div>
+                <div class="user-profile-nav" id="nav-user-profile">
+                    <!-- Nav user profile -->
+                </div>
+            </div>
+
+            <!-- Tab: Dashboard / Manage Servers -->
+            <div id="tab-servers" class="tab-content">
+                <div class="config-card" style="text-align: center; padding: 3rem 2rem;">
+                    <div class="empty-icon" style="font-size: 3rem; color: var(--accent-red); margin-bottom: 1.5rem;">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h2 style="font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 1rem;">Manage Your Servers</h2>
+                    <p style="color: var(--text-gray); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                        Click the button below to be redirected to our main management portal where you can invite the bot and configure your servers.
+                    </p>
+                    <a href="https://nonjuristic-audria-uncapturable.ngrok-free.dev/" class="btn btn-primary btn-pill" style="padding: 1rem 3rem; font-size: 1.1rem; font-weight: 800;">
+                        <i class="fas fa-external-link-alt" style="margin-right: 10px;"></i> MANAGE SERVERS
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tab: Overview (Now hidden/merged) -->
+            <div id="tab-overview" class="tab-content hidden">
+                <div class="config-card">
+                    <div class="card-header">
+                        <div class="card-title" style="display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-history"></i> Recent Actions
+                            <span style="font-size:0.64rem; font-weight:900; letter-spacing:.6px; padding:2px 6px; border-radius:999px; color: var(--accent-red); background: rgba(255,51,51,0.12); border:1px solid rgba(255,51,51,0.28);">BETA</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center; margin-bottom: 0.5rem;">
+                        <input id="recent-log-search" class="input-field" placeholder="Filter by text, type or guild ID..." style="flex:1;">
+                        <select id="recent-log-type" class="input-field" style="max-width:200px;">
+                            <option value="">All Dashboard</option>
+                            <option value="CONFIG_UPDATE">Config Update</option>
+                            <option value="PREFIX_UPDATE">Prefix Update</option>
+                            <option value="MODULE_UPDATE">Module Update</option>
+                            <option value="WHITELIST_UPDATE">Whitelist Update</option>
+                            <option value="FULL_SYNC">Full Sync</option>
+                        </select>
+                    </div>
+                    <div id="recent-logs" style="color: var(--text-gray); font-size: 0.85rem; max-height: 240px; overflow-y: auto; border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px; background: rgba(255,255,255,0.02);">
+                        <div style="text-align:center; color: var(--text-muted); font-size: 0.8rem;">Waiting for activity...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Config / General (Shown after server selection) -->
+            <div id="tab-config" class="tab-content hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div id="active-guild-icon" class="server-icon-wrapper" style="position: relative; bottom: 0; left: 0;"></div>
+                        <div>
+                            <h2 id="active-guild-name" style="font-size: 1.8rem; font-weight: 800; letter-spacing: -1px;">Server Config</h2>
+                            <p id="active-guild-id" style="font-size: 0.8rem; color: var(--text-gray);"></p>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveGuildConfig()"><i class="fas fa-save"></i> Save Config</button>
+                </div>
+
+                <!-- Prefix & General -->
+                <div class="config-card">
+                    <div class="card-title"><i class="fas fa-hashtag"></i> General Configuration</div>
+                    <div class="control-group" style="margin-top: 1.5rem;">
+                        <div class="control-item">
+                            <label>Command Prefix</label>
+                            <input type="text" id="cfg-prefix" class="input-field" placeholder="!">
+                        </div>
+                        <div class="control-item">
+                            <label>Language</label>
+                            <select id="cfg-lang" class="input-field">
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Moderation -->
+            <div id="tab-moderation" class="tab-content hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -1px;">Moderation</h2>
+                    <button class="btn btn-primary" style="opacity: 0.5; cursor: not-allowed;" disabled><i class="fas fa-lock"></i> Locked</button>
+                </div>
+                
+                <div class="config-card" style="text-align: center; padding: 4rem 2rem; background: linear-gradient(145deg, rgba(20,20,20,0.9), rgba(10,10,10,0.95)); border: 1px solid rgba(255, 51, 51, 0.1); position: relative; overflow: hidden;">
+                    <!-- Decorative Background Element -->
+                    <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: var(--accent-red); filter: blur(100px); opacity: 0.05; pointer-events: none;"></div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <div style="width: 80px; height: 80px; background: rgba(255, 51, 51, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 1px solid rgba(255, 51, 51, 0.2);">
+                            <i class="fas fa-shield-alt" style="font-size: 2.5rem; color: var(--accent-red);"></i>
+                        </div>
+                        <h3 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 1rem; letter-spacing: -1px; background: linear-gradient(to right, #fff, var(--text-gray)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Advanced Moderation</h3>
+                        <div style="display: inline-block; padding: 6px 16px; background: var(--accent-red); color: #fff; border-radius: 100px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(255, 51, 51, 0.3);">
+                            Coming Soon
+                        </div>
+                    </div>
+
+                    <p style="color: var(--text-gray); font-size: 1.1rem; max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.6;">
+                        We're building the ultimate moderation toolkit. Get ready for advanced warning systems, temporary bans, and automated case management.
+                    </p>
+
+                    <div class="control-group" style="grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 800px; margin: 0 auto;">
+                        <div class="control-item" style="opacity: 0.6; border-style: dashed;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; color: var(--accent-red); margin-bottom: 10px; display: block;"></i>
+                            <span style="font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 5px;">Warning System</span>
+                            <p style="font-size: 0.65rem; color: var(--text-muted);">Track and manage user infractions automatically.</p>
+                        </div>
+                        <div class="control-item" style="opacity: 0.6; border-style: dashed;">
+                            <i class="fas fa-gavel" style="font-size: 1.5rem; color: var(--accent-red); margin-bottom: 10px; display: block;"></i>
+                            <span style="font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 5px;">Timed Punishments</span>
+                            <p style="font-size: 0.65rem; color: var(--text-muted);">Schedule temporary mutes and bans with ease.</p>
+                        </div>
+                        <div class="control-item" style="opacity: 0.6; border-style: dashed;">
+                            <i class="fas fa-file-invoice" style="font-size: 1.5rem; color: var(--accent-red); margin-bottom: 10px; display: block;"></i>
+                            <span style="font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 5px;">Case History</span>
+                            <p style="font-size: 0.65rem; color: var(--text-muted);">Comprehensive logs for every moderation action.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Auto Mod -->
+            <div id="tab-automod" class="tab-content hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -1px;">Auto Moderation</h2>
+                    <button class="btn btn-primary" onclick="saveGuildConfig()"><i class="fas fa-save"></i> Save Changes</button>
+                </div>
+                <!-- Auto Mod Details -->
+                <div class="config-card" id="panel-automod">
+                    <div class="card-title"><i class="fas fa-robot"></i> Auto Moderation Controls</div>
+                    <div class="control-group" style="margin-top: 1.5rem;">
+                        <div class="control-item" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span id="automod-status-label">AutoMod Status</span>
+                            <label class="switch"><input type="checkbox" id="mod-automod" onchange="updateAutoModUI()"><span class="slider"></span></label>
+                        </div>
+                        <div class="control-item" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Block External Links</span>
+                            <label class="switch"><input type="checkbox" id="cfg-link-block"><span class="slider"></span></label>
+                        </div>
+                        <div class="control-item" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Caps Filter</span>
+                            <label class="switch"><input type="checkbox" id="cfg-caps-filter"><span class="slider"></span></label>
+                        </div>
+                        <div class="control-item" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Block Server Invites</span>
+                            <label class="switch"><input type="checkbox" id="cfg-invite-block"><span class="slider"></span></label>
+                        </div>
+                        <div class="control-item">
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--text-gray);">AutoMod Log Channel</label>
+                            <div class="select-wrapper" style="position: relative;">
+                                <i class="fas fa-hashtag" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem; pointer-events: none;"></i>
+                                <select id="cfg-log-channel" class="input-field" style="padding-left: 35px; appearance: none; -webkit-appearance: none; cursor: pointer; background: rgba(0,0,0,0.4);">
+                                    <option value="" disabled selected>Select a channel...</option>
+                                    <option value="AUTO_CREATE" style="background: var(--bg-dark); color: #fff;">✨ Auto-create 'hitman-logs'</option>
+                                </select>
+                                <i class="fas fa-chevron-down" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; font-size: 0.8rem;"></i>
+                            </div>
+                            <p style="font-size: 0.7rem; color: var(--accent-red); margin-top: 8px; opacity: 0.8; display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-magic"></i> Bot will automatically create and set permissions for 'hitman-logs'.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Anti Nuke -->
+            <div id="tab-antinuke" class="tab-content hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -1px;">Anti Nuke Protection</h2>
+                    <button class="btn btn-primary" onclick="saveGuildConfig()"><i class="fas fa-save"></i> Save Changes</button>
+                </div>
+                <!-- Anti Nuke Details -->
+                <div class="config-card" id="panel-antinuke">
+                    <div class="card-title"><i class="fas fa-user-shield"></i> Anti-Nuke Protection</div>
+                    <div class="control-group" style="margin-top: 1.5rem;">
+                        <div class="control-item" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span id="antinuke-status-label">Anti Nuke Status</span>
+                            <label class="switch"><input type="checkbox" id="mod-antinuke" onchange="updateAntiNukeUI()"><span class="slider"></span></label>
+                        </div>
+                        <div class="control-item" style="margin-top: 1rem; background: linear-gradient(145deg, rgba(20,20,20,0.95), rgba(10,10,10,0.95)); border: 1px solid rgba(255,255,255,0.06); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03); border-radius:14px;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                                <label style="display:block; font-size:0.9rem; font-weight:800; letter-spacing:.3px;">Antinuke Whitelist</label>
+                                <span id="whitelist-count" style="color: var(--text-muted); font-size: 0.75rem;">0 IDs</span>
+                            </div>
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:8px; margin-bottom:10px;">
+                                <button class="btn btn-secondary" id="add-self-whitelist" style="border-radius:999px;"><i class="fas fa-user-plus"></i> Add Me</button>
+                                <button class="btn btn-secondary" id="paste-whitelist" style="border-radius:999px;"><i class="fas fa-paste"></i> Paste</button>
+                                <button class="btn btn-secondary" id="unique-whitelist" style="border-radius:999px;"><i class="fas fa-compress"></i> Unique</button>
+                                <button class="btn btn-secondary" id="sort-whitelist" style="border-radius:999px;"><i class="fas fa-sort-amount-up-alt"></i> Sort</button>
+                                <button class="btn btn-secondary" id="export-whitelist" style="border-radius:999px;"><i class="fas fa-download"></i> Export</button>
+                                <button class="btn btn-secondary" id="clear-whitelist" style="border-radius:999px;"><i class="fas fa-trash"></i> Clear</button>
+                            </div>
+                            <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                                <input id="whitelist-add-input" class="input-field" placeholder="Add user ID and press Enter..." style="flex:1; min-width:220px;">
+                                <button class="btn btn-primary" id="whitelist-add-btn" style="border-radius:999px; padding:8px 14px;">Add</button>
+                            </div>
+                            <div id="whitelist-chips" style="display:flex; gap:8px; flex-wrap: wrap; margin-bottom:8px;"></div>
+                            <textarea id="cfg-whitelist" class="input-field" style="width: 100%; min-height: 48px; resize: vertical; border-radius:12px; font-size:0.85rem;" placeholder="123456789, 987654321"></textarea>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Bugs -->
+            <div id="tab-logging" class="tab-content hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -1px;">Bug Reports & Feedback</h2>
+                        <p style="color: var(--text-gray); font-size: 0.9rem;">Help us improve by reporting bugs or sharing your thoughts.</p>
+                    </div>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div id="admin-bug-count" style="display: none; background: rgba(255, 51, 51, 0.1); color: var(--accent-red); padding: 8px 15px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; border: 1px solid rgba(255, 51, 51, 0.2);">
+                            <i class="fas fa-list-ul"></i> <span id="bug-count-num">0</span> Reports
+                        </div>
+                        <button class="btn btn-primary" onclick="openBugModal()"><i class="fas fa-plus"></i> Report a Bug</button>
+                    </div>
+                </div>
+
+                <!-- Rules Section -->
+                <div class="config-card" style="border-left: 4px solid var(--accent-red); background: rgba(255, 51, 51, 0.02);">
+                    <div class="card-title" style="font-size: 1rem; margin-bottom: 1rem;"><i class="fas fa-gavel"></i> Reporting Rules</div>
+                    <ul style="color: var(--text-gray); font-size: 0.85rem; line-height: 1.6; padding-left: 1.2rem;">
+                        <li>Provide a clear and descriptive title for your report.</li>
+                    <li>Be detailed in the description. Explain how to reproduce the bug if possible.</li>
+                    <li>Attach a screenshot (PNG/JPG) to help us understand the issue better.</li>
+                    <li>Do not spam the report system. Check if the bug has already been reported.</li>
+                        <li>Be respectful. Offensive language will result in a ban from the dashboard.</li>
+                    </ul>
+                </div>
+
+                <!-- Bug Report Form (Modal-like card) -->
+                <div id="bug-report-form" class="config-card hidden" style="margin-bottom: 2rem; border: 1px solid var(--accent-red);">
+                    <div class="card-title" style="display: flex; justify-content: space-between;">
+                        <span><i class="fas fa-bug"></i> Submit New Report</span>
+                        <i class="fas fa-times" style="cursor: pointer; color: var(--text-muted);" onclick="closeBugModal()"></i>
+                    </div>
+                    <div class="control-group" style="margin-top: 1.5rem; display: block;">
+                        <div class="control-item" style="margin-bottom: 1rem;">
+                            <label>Report Title</label>
+                            <input type="text" id="bug-title" class="input-field" placeholder="Brief summary of the issue...">
+                        </div>
+                        <div class="control-item" style="margin-bottom: 1rem;">
+                            <label>Description</label>
+                            <textarea id="bug-desc" class="input-field" rows="3" placeholder="Describe the bug or share your feedback in detail..."></textarea>
+                        </div>
+                        <div class="control-item" style="margin-bottom: 1rem;">
+                            <label>Image Evidence (PNG, JPG only)</label>
+                            <div id="bug-media-dropzone" style="border: 2px dashed var(--glass-border); border-radius: 12px; padding: 2rem; text-align: center; cursor: pointer; transition: var(--transition); margin-bottom: 10px;">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 10px;"></i>
+                                <p style="font-size: 0.8rem; color: var(--text-gray);">Drag & Drop or click to upload</p>
+                                <div id="upload-spinner" style="display: none; margin-top: 10px;">
+                                    <i class="fas fa-spinner fa-spin" style="color: var(--accent-red);"></i>
+                                    <span style="font-size: 0.75rem; color: var(--text-gray); margin-left: 8px;">Processing image...</span>
+                                </div>
+                                <input type="file" id="bug-media-file" style="display: none;" accept="image/png,image/jpeg,image/jpg">
+                                <div id="media-preview" style="margin-top: 10px; display: none;">
+                                    <span id="file-name" style="font-size: 0.75rem; color: var(--accent-red);"></span>
+                                    <i class="fas fa-times" style="margin-left: 10px; color: var(--text-muted); cursor: pointer;" onclick="clearMediaSelection()"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="submitBugReport()" style="width: 100%;">Post Report</button>
+                    </div>
+                </div>
+
+                <!-- Bug Feed -->
+                <div id="bug-feed" class="bug-container">
+                    <!-- Bug posts will be injected here -->
+                    <div style="text-align: center; padding: 3rem; color: var(--text-gray);">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Loading bug reports...</p>
+                    </div>
+                </div>
+
+                <!-- Custom Confirmation Modal -->
+                <div id="delete-confirm-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+                    <div class="config-card" style="width: 90%; max-width: 400px; text-align: center; border: 1px solid var(--accent-red);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--accent-red); margin-bottom: 1.5rem;"></i>
+                        <h3 style="color: #fff; margin-bottom: 1rem;">Delete Report?</h3>
+                        <p style="color: var(--text-gray); margin-bottom: 2rem; font-size: 0.9rem;">Are you sure you want to delete this bug report? This action cannot be undone.</p>
+                        <div style="display: flex; gap: 15px;">
+                            <button class="btn" style="flex: 1; background: rgba(255,255,255,0.05); color: #fff;" onclick="hideDeleteModal()">Cancel</button>
+                            <button id="confirm-delete-btn" class="btn btn-primary" style="flex: 1;">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .hidden { display: none !important; }
+                .bug-post {
+                    background: var(--bg-dark);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 12px;
+                    padding: 1rem;
+                    margin-bottom: 1rem;
+                    transition: var(--transition);
+                    max-width: 800px;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                .bug-post:hover {
+                    border-color: rgba(255, 51, 51, 0.3);
+                    transform: translateY(-1px);
+                }
+                .bug-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 0.75rem;
+                }
+                .bug-user-avatar {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    border: 1px solid var(--glass-border);
+                }
+                .bug-meta {
+                    flex: 1;
+                }
+                .bug-username {
+                    font-weight: 700;
+                    font-size: 0.85rem;
+                    color: #fff;
+                }
+                .bug-title {
+                    font-size: 0.95rem;
+                    font-weight: 800;
+                    color: #fff;
+                    margin-bottom: 0.4rem;
+                }
+                .bug-time {
+                    font-size: 0.65rem;
+                    color: var(--text-muted);
+                }
+                .bug-content {
+                    font-size: 0.85rem;
+                    color: var(--text-gray);
+                    line-height: 1.4;
+                    margin-bottom: 0.75rem;
+                }
+                .bug-delete-btn {
+                    background: rgba(255, 51, 51, 0.1);
+                    color: var(--accent-red);
+                    border: none;
+                    padding: 4px 10px;
+                    border-radius: 6px;
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: var(--transition);
+                }
+                .bug-delete-btn:hover {
+                    background: var(--accent-red);
+                    color: #fff;
+                }
+                .bug-media-container {
+                    border-radius: 8px;
+                    overflow: hidden;
+                    border: 1px solid var(--glass-border);
+                    margin-top: 8px;
+                    max-height: 350px;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #000;
+                }
+                .bug-media-container img, .bug-media-container video {
+                    max-width: 100%;
+                    max-height: 350px;
+                    width: auto;
+                    height: auto;
+                    object-fit: contain;
+                    display: block;
+                }
+            </style>
+        </main>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const CLIENT_ID = FRONTEND_CONFIG.DISCORD_CLIENT_ID;
+        
+        let currentUser = null;
+        let activeGuild = null;
+        const socket = io(FRONTEND_CONFIG.BACKEND_URL);
+        function getBotWsToken() { return localStorage.getItem('bot_ws_token') || ''; }
+        let modulePollTimer = null;
+
+        function fetchBotGuildsViaSocket(userId) {
+            return new Promise(resolve => {
+                const WS_TOKEN = getBotWsToken();
+                const to = setTimeout(() => {
+                    resolve([]);
+                }, 8000);
+                const payload = { token: WS_TOKEN || '', userId: String(userId || '') };
+                socket.emit('getGuilds', payload, (res) => {
+                    clearTimeout(to);
+                    if (res && res.success && Array.isArray(res.data)) {
+                        resolve(res.data);
+                    } else {
+                        resolve([]);
+                    }
+                });
+            });
+        }
+
+        // WebSocket status listener
+        socket.on('bot_status_update', (data) => {
+            updateBotStatusUI(data);
+        });
+        socket.on('module_state_update', (p) => {
+            try {
+                if (!p || !activeGuild) return;
+                if (String(p.guildId) !== String(activeGuild.id)) return;
+                const m = String(p.module || '').toLowerCase().replace(/[^a-z]/g,'');
+                if (m === 'antinuke') {
+                    const toggle = document.getElementById('mod-antinuke');
+                    if (toggle) {
+                        toggle.checked = !!p.enabled;
+                        updateAntiNukeUI();
+                    }
+                } else if (m === 'automod' || m === 'automoderation') {
+                    const toggle = document.getElementById('mod-automod');
+                    if (toggle) {
+                        toggle.checked = !!p.enabled;
+                        updateAutoModUI();
+                    }
+                }
+            } catch (e) {}
+        });
+
+        document.getElementById('mod-antinuke')?.addEventListener('change', (e) => {
+            const v = !!e.target.checked;
+            updateAntiNukeUI();
+            pushModuleState('antinuke', v);
+        });
+        document.getElementById('mod-automod')?.addEventListener('change', (e) => {
+            const v = !!e.target.checked;
+            updateAutoModUI();
+            pushModuleState('automod', v);
+        });
+
+        function updateBotStatusUI(data) {
+            // Function preserved for compatibility but elements removed from UI
+            if (!data) return;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hashParams = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+            const userFromUrl = urlParams.get('user_data') || hashParams.get('user_data');
+            
+            if (userFromUrl) {
+                try {
+                    const userData = JSON.parse(decodeURIComponent(userFromUrl));
+                    localStorage.setItem('agency_chat_user', JSON.stringify(userData));
+                    // Clean URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+
+            const userStr = localStorage.getItem('agency_chat_user');
+            if (!userStr) {
+                window.location.href = 'home';
+                return;
+            }
+
+            currentUser = JSON.parse(userStr);
+            
+            updateUI();
+            fetchBotStatus();
+
+            // Handle deep linking and token fetching
+            const guildId = urlParams.get('id');
+            const tabParam = urlParams.get('tab');
+            const wsTokenParam = urlParams.get('bot_ws_token');
+            
+            if (wsTokenParam) {
+                localStorage.setItem('bot_ws_token', wsTokenParam);
+                try { history.replaceState({}, document.title, window.location.pathname); } catch (e) {}
+            }
+
+            const initializeDashboard = () => {
+                if (tabParam) {
+                    showTab(tabParam);
+                } else {
+                    showTab('servers');
+                }
+                if (guildId) {
+                    setTimeout(() => selectGuild(guildId), 500);
+                }
+            };
+
+            const existingToken = localStorage.getItem('bot_ws_token');
+            if (!existingToken) {
+                fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/socket-token`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.token) localStorage.setItem('bot_ws_token', data.token);
+                    })
+                    .catch(err => console.error('Error fetching socket token:', err))
+                    .finally(() => {
+                        initializeDashboard();
+                    });
+            } else {
+                initializeDashboard();
+            }
+        });
+
+        function updateUI() {
+            const sidebarUser = document.getElementById('sidebar-user');
+            const navUser = document.getElementById('nav-user-profile');
+            
+            if (currentUser) {
+                sidebarUser.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <img src="${currentUser.avatar}" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--glass-border);">
+                        <div style="overflow: hidden;">
+                            <div style="font-weight: 700; font-size: 0.85rem; white-space: nowrap; text-overflow: ellipsis;">${currentUser.name}</div>
+                            <div style="font-size: 0.7rem; color: var(--accent-red); text-transform: uppercase; font-weight: 800;">${currentUser.rank || 'MEMBER'}</div>
+                        </div>
+                    </div>
+                `;
+ 
+                navUser.innerHTML = `
+                    <img src="${currentUser.avatar}" alt="User">
+                    <span style="font-weight: 700; font-size: 0.85rem;">${currentUser.name}</span>
+                    <span class="logout-badge" onclick="showLogoutModal()"><i class="fas fa-sign-out-alt"></i> Logout</span>
+                `;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('agency_chat_user');
+            window.location.href = 'home.html';
+        }
+        function showLogoutModal() {
+            const m = document.getElementById('logout-modal');
+            if (m) m.style.display = 'flex';
+        }
+        function hideLogoutModal() {
+            const m = document.getElementById('logout-modal');
+            if (m) m.style.display = 'none';
+        }
+        function confirmLogout() {
+            try { localStorage.removeItem('agency_chat_user'); } catch (e) {}
+            window.location.href = 'home.html';
+        }
+
+        function showTab(tabId) {
+            const moduleIds = ['automod','antinuke','moderation','config'];
+            if (moduleIds.includes(tabId) && !activeGuild) {
+                showToast('Select a server first to configure modules.', 'warning');
+                tabId = 'servers';
+            }
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            if (activeTab) activeTab.classList.remove('hidden');
+            
+            // Toggle visibility of server modules section based on active tab
+            const moduleTabs = document.getElementById('module-tabs');
+            
+            // Highlight all matching menu items for this tab (both in Main and Server Modules)
+            document.querySelectorAll('.menu-item').forEach(m => {
+                if (m.getAttribute('onclick')?.includes(`'${tabId}'`)) {
+                    m.classList.add('active');
+                }
+            });
+
+            const modulePages = ['config','moderation','automod','antinuke'];
+            if (moduleTabs) {
+                if (modulePages.includes(tabId) && activeGuild) {
+                    moduleTabs.classList.remove('hidden');
+                } else {
+                    moduleTabs.classList.add('hidden');
+                }
+            }
+
+            if (tabId === 'servers') {
+                renderGuilds();
+            }
+
+            // Load bugs if bug tab is selected
+            if (tabId === 'logging') {
+                loadBugs();
+            }
+        }
+
+        // --- Bug System Logic ---
+        let selectedMediaFile = null;
+
+        function openBugModal() {
+            document.getElementById('bug-report-form').classList.remove('hidden');
+            initBugDropzone();
+        }
+
+        function closeBugModal() {
+            document.getElementById('bug-report-form').classList.add('hidden');
+            clearMediaSelection();
+        }
+
+        function initBugDropzone() {
+            const dropzone = document.getElementById('bug-media-dropzone');
+            const fileInput = document.getElementById('bug-media-file');
+
+            dropzone.onclick = () => fileInput.click();
+
+            dropzone.ondragover = (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--accent-red)';
+                dropzone.style.background = 'rgba(255, 51, 51, 0.05)';
+            };
+
+            dropzone.ondragleave = () => {
+                dropzone.style.borderColor = 'var(--glass-border)';
+                dropzone.style.background = 'transparent';
+            };
+
+            dropzone.ondrop = (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--glass-border)';
+                dropzone.style.background = 'transparent';
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    handleMediaSelection(e.dataTransfer.files[0]);
+                }
+            };
+
+            fileInput.onchange = (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    handleMediaSelection(e.target.files[0]);
+                }
+            };
+        }
+
+        async function handleMediaSelection(file) {
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+            if (!allowedTypes.includes(file.type)) {
+                showToast('Only PNG and JPG images are allowed.', 'error');
+                return;
+            }
+
+            // Show loading animation
+            const spinner = document.getElementById('upload-spinner');
+            const preview = document.getElementById('media-preview');
+            const icon = document.querySelector('#bug-media-dropzone i');
+            const text = document.querySelector('#bug-media-dropzone p');
+            
+            spinner.style.display = 'block';
+            preview.style.display = 'none';
+            icon.style.display = 'none';
+            text.style.display = 'none';
+
+            // Simulate processing delay for the animation
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            selectedMediaFile = file;
+            document.getElementById('file-name').innerText = `Selected: ${file.name}`;
+            
+            spinner.style.display = 'none';
+            preview.style.display = 'block';
+            icon.style.display = 'block';
+            text.style.display = 'block';
+        }
+
+        function clearMediaSelection() {
+            selectedMediaFile = null;
+            document.getElementById('file-name').innerText = '';
+            document.getElementById('media-preview').style.display = 'none';
+            document.getElementById('upload-spinner').style.display = 'none';
+            document.querySelector('#bug-media-dropzone i').style.display = 'block';
+            document.querySelector('#bug-media-dropzone p').style.display = 'block';
+            document.getElementById('bug-media-file').value = '';
+        }
+
+        async function submitBugReport() {
+            const title = document.getElementById('bug-title').value.trim();
+            const desc = document.getElementById('bug-desc').value.trim();
+
+            if (!title) {
+                showToast('Please provide a title for your report.', 'warning');
+                return;
+            }
+            if (!desc) {
+                showToast('Please provide a description.', 'warning');
+                return;
+            }
+
+            // Enforce media upload
+            if (!selectedMediaFile) {
+                showToast('Please upload an image (PNG/JPG) before posting.', 'warning');
+                return;
+            }
+
+            // Convert image to base64
+            let mediaData = '';
+            try {
+                showToast('Processing image for upload...', 'info');
+                mediaData = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = (e) => reject(e);
+                    reader.readAsDataURL(selectedMediaFile);
+                });
+            } catch (e) {
+                console.error('Image processing failed:', e);
+                showToast('Failed to process image.', 'error');
+                return;
+            }
+
+            const report = {
+                userId: (currentUser && currentUser.id) ? currentUser.id : 'anonymous',
+                username: (currentUser && currentUser.name) ? currentUser.name : 'Anonymous User',
+                avatar: (currentUser && currentUser.avatar) ? currentUser.avatar : 'https://cdn.discordapp.com/embed/avatars/0.png',
+                rank: (currentUser && currentUser.rank) ? currentUser.rank : 'User',
+                title: title,
+                description: desc,
+                media: mediaData,
+                timestamp: Date.now()
+            };
+
+            try {
+                const res = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bugs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(report)
+                });
+
+                if (res.ok) {
+                    document.getElementById('bug-title').value = '';
+                    document.getElementById('bug-desc').value = '';
+                    clearMediaSelection();
+                    closeBugModal();
+                    loadBugs();
+                    showToast('Bug report submitted successfully!', 'success');
+                } else {
+                    const text = await res.text();
+                    let errorMessage = 'Failed to submit report.';
+                    try {
+                        const data = JSON.parse(text);
+                        errorMessage = data.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = `Error ${res.status}: ${text.substring(0, 50)}...`;
+                    }
+                    showToast(errorMessage, 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast(`Connection Error: ${err.message}`, 'error');
+            }
+        }
+
+        async function loadBugs() {
+            const feed = document.getElementById('bug-feed');
+            const bugCountBadge = document.getElementById('admin-bug-count');
+            const bugCountNum = document.getElementById('bug-count-num');
+            
+            // Wait for currentUser to be available if it's still null
+            if (!currentUser) {
+                const userStr = localStorage.getItem('agency_chat_user');
+                if (userStr) {
+                    currentUser = JSON.parse(userStr);
+                }
+            }
+
+            // Enforce visibility: Only Founder/Owner can see all reports
+            const userRank = (currentUser?.rank || '').toLowerCase();
+            const isAdmin = userRank === 'founder' || userRank === 'owner';
+
+            if (!isAdmin) {
+                if (bugCountBadge) bugCountBadge.style.display = 'none';
+                feed.innerHTML = `
+                    <div class="config-card" style="text-align: center; padding: 2rem; border: 1px dashed var(--glass-border); background: rgba(0,0,0,0.1);">
+                        <i class="fas fa-shield-alt" style="font-size: 2rem; color: var(--accent-red); margin-bottom: 1rem;"></i>
+                        <h3 style="color: #fff; margin-bottom: 0.5rem;">Report Feed Restricted</h3>
+                        <p style="color: var(--text-gray); font-size: 0.85rem; max-width: 400px; margin: 0 auto;">
+                            Your reports have been sent directly to the development team. 
+                            The public feed is only visible to Founders and Owners for security reasons.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const res = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bugs`);
+                const bugs = await res.json();
+
+                if (bugCountBadge) {
+                    bugCountBadge.style.display = 'block';
+                    bugCountNum.innerText = bugs.length || 0;
+                }
+
+                if (!bugs || bugs.length === 0) {
+                    feed.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: var(--text-gray);">
+                            <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem; color: #00ff00;"></i>
+                            <p>No bugs reported yet. Everything is looking good!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const canDelete = currentUser && (currentUser.rank?.toLowerCase() === 'founder' || currentUser.rank?.toLowerCase() === 'owner');
+
+                feed.innerHTML = bugs.map(bug => {
+                    const timeStr = new Date(bug.timestamp).toLocaleString();
+                    let mediaHtml = '';
+                    if (bug.media) {
+                        const isVideo = bug.media.match(/\.(mp4|webm|ogg)$/i) || 
+                                        bug.media.includes('youtube.com') || 
+                                        bug.media.includes('youtu.be') || 
+                                        bug.media.includes('video') ||
+                                        bug.media.startsWith('data:video');
+                        
+                        const isBase64 = bug.media.startsWith('data:image') || bug.media.startsWith('data:video');
+                        
+                        if (isVideo) {
+                            mediaHtml = `
+                                <div class="bug-media-container">
+                                    <video src="${bug.media}" controls playsinline preload="metadata" style="width: 100%; height: auto; max-height: 350px;">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>`;
+                        } else if (isBase64 || bug.media.match(/\.(png|jpg|jpeg|gif|webp)$/i) || bug.media.includes('image')) {
+                            mediaHtml = `<div class="bug-media-container"><img src="${bug.media}" alt="Bug evidence"></div>`;
+                        } else if (bug.media.startsWith('[Uploaded:')) {
+                            mediaHtml = `<div style="margin-top: 10px; font-size: 0.8rem; color: var(--accent-red); background: rgba(255,51,51,0.05); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,51,51,0.1);">
+                                            <i class="fas fa-file-video"></i> ${bug.media} 
+                                            <span style="display: block; font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">Video is processing or too large for direct preview.</span>
+                                         </div>`;
+                        }
+                    }
+
+                    return `
+                        <div class="bug-post" id="bug-${bug.id}">
+                            <div class="bug-header">
+                                <img src="${bug.avatar}" class="bug-user-avatar">
+                                <div class="bug-meta">
+                                    <div class="bug-username">${bug.username}</div>
+                                    <div class="bug-time">${timeStr}</div>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    ${canDelete ? `<button class="bug-delete-btn" onclick="deleteBug('${bug.id}')"><i class="fas fa-trash"></i> Delete</button>` : ''}
+                                    <div style="background: rgba(255, 51, 51, 0.1); color: var(--accent-red); padding: 4px 10px; border-radius: 100px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase;">Report</div>
+                                </div>
+                            </div>
+                            <div class="bug-title">${bug.title || 'Untitled Report'}</div>
+                            <div class="bug-content">${bug.description}</div>
+                            ${mediaHtml}
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                feed.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: var(--text-gray);">
+                        <i class="fas fa-bug" style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent-red);"></i>
+                        <p>No bug reports found. Be the first to report one!</p>
+                    </div>
+                `;
+            }
+        }
+
+        function hideDeleteModal() {
+            document.getElementById('delete-confirm-modal').classList.add('hidden');
+        }
+
+        async function deleteBug(bugId) {
+            const modal = document.getElementById('delete-confirm-modal');
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            
+            modal.classList.remove('hidden');
+
+            // Set up a one-time click handler for the confirm button
+            confirmBtn.onclick = async () => {
+                hideDeleteModal();
+                try {
+                    const res = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bugs/${bugId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'x-user-id': currentUser.id,
+                            'x-user-rank': currentUser.rank
+                        }
+                    });
+
+                    if (res.ok) {
+                        showToast('Bug report deleted successfully.', 'success');
+                        loadBugs();
+                    } else {
+                        const data = await res.json().catch(() => ({}));
+                        showToast(data.error || 'Failed to delete bug report.', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast('Error connecting to server.', 'error');
+                }
+            };
+        }
+
+        async function renderGuilds() {
+            // Function disabled as per request to remove server list
+            return;
+        }
+
+        async function selectGuild(guildId) {
+            activeGuild = currentUser.guilds.find(g => g.id === guildId);
+            if (!activeGuild) {
+                // If not in cached list, might need to re-fetch or show error
+                showToast('Server not found or access denied.', 'error');
+                return;
+            }
+
+            showTab('config');
+            
+            document.getElementById('active-guild-name').innerText = activeGuild.name;
+            document.getElementById('active-guild-id').innerText = `GUILD ID: ${activeGuild.id}`;
+            
+            const iconWrap = document.getElementById('active-guild-icon');
+            if (activeGuild.icon) {
+                iconWrap.innerHTML = `<img src="https://cdn.discordapp.com/icons/${activeGuild.id}/${activeGuild.icon}.png" style="width:60px; height:60px; object-fit:cover; border-radius:15px; border: 2px solid var(--glass-border);">`;
+            } else {
+                iconWrap.innerHTML = `<div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; background:#333; border-radius:15px; font-weight:900; border: 2px solid var(--glass-border);">${activeGuild.name.charAt(0)}</div>`;
+            }
+
+            // Fetch settings from Firebase via our backend
+            try {
+                const res = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${guildId}/config`, {
+                    headers: {
+                        'x-user-id': currentUser.id
+                    }
+                });
+                
+                if (!res.ok) throw new Error('Failed to load config');
+                
+                const config = await res.json();
+                applyConfigToUI(config);
+                
+                // Fetch channels for logging
+                fetchGuildChannels(guildId);
+                
+                // Ensure module toggles reflect live bot state (socket-first API)
+                try {
+                    const [antiRes, autoRes] = await Promise.all([
+                        fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${guildId}/modules/antinuke`, { headers: { 'x-user-id': currentUser.id } }),
+                        fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${guildId}/modules/automod`, { headers: { 'x-user-id': currentUser.id } })
+                    ]);
+                    if (antiRes.ok) {
+                        const d = await antiRes.json();
+                        const t = document.getElementById('mod-antinuke');
+                        if (t) { t.checked = !!d.enabled; updateAntiNukeUI(); }
+                    }
+                    if (autoRes.ok) {
+                        const d = await autoRes.json();
+                        const t = document.getElementById('mod-automod');
+                        if (t) { t.checked = !!d.enabled; updateAutoModUI(); }
+                    }
+                } catch (e) {}
+
+                // Start periodic poll as a safety net in case bot doesn't push events
+                try { if (modulePollTimer) clearInterval(modulePollTimer); } catch (e) {}
+                modulePollTimer = setInterval(async () => {
+                    if (!activeGuild) return;
+                    try {
+                        const r1 = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${activeGuild.id}/modules/antinuke`, { headers: { 'x-user-id': currentUser.id }, cache: 'no-store' });
+                        if (r1.ok) {
+                            const d = await r1.json();
+                            const t = document.getElementById('mod-antinuke');
+                            if (t) { t.checked = !!d.enabled; updateAntiNukeUI(); }
+                        }
+                        const r2 = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${activeGuild.id}/modules/automod`, { headers: { 'x-user-id': currentUser.id }, cache: 'no-store' });
+                        if (r2.ok) {
+                            const d = await r2.json();
+                            const t = document.getElementById('mod-automod');
+                            if (t) { t.checked = !!d.enabled; updateAutoModUI(); }
+                        }
+                    } catch (e) {}
+                }, 15000);
+            } catch (err) {
+                console.error('Failed to load guild config:', err);
+                showToast('Failed to load server configuration.', 'error');
+            }
+        }
+
+        // Pause/resume polling when tab hidden/visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                try { if (modulePollTimer) clearInterval(modulePollTimer); } catch (e) {}
+            } else if (activeGuild) {
+                // kick a one-off refresh on return
+                fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${activeGuild.id}/modules/antinuke`).then(r => r.json().catch(()=>({}))).then(d => {
+                    const t = document.getElementById('mod-antinuke'); if (t && typeof d.enabled !== 'undefined') { t.checked = !!d.enabled; updateAntiNukeUI(); }
+                }).catch(()=>{});
+                fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${activeGuild.id}/modules/automod`).then(r => r.json().catch(()=>({}))).then(d => {
+                    const t = document.getElementById('mod-automod'); if (t && typeof d.enabled !== 'undefined') { t.checked = !!d.enabled; updateAutoModUI(); }
+                }).catch(()=>{});
+            }
+        });
+
+        document.getElementById('sync-servers-btn')?.addEventListener('click', () => { renderGuilds(); });
+
+        function applyConfigToUI(config) {
+            if (!config) return;
+            
+            // General
+            document.getElementById('cfg-prefix').value = config.prefix || '!';
+            if (config.language) document.getElementById('cfg-lang').value = config.language;
+            
+            // Modules
+            const automodToggle = document.getElementById('mod-automod');
+            if (automodToggle) {
+                automodToggle.checked = (config.automod?.enabled ?? config.modules?.automod ?? false);
+                updateAutoModUI();
+            }
+
+            // Automod Details
+            if (config.automod) {
+                document.getElementById('cfg-link-block').checked = config.automod.linkBlock || false;
+                document.getElementById('cfg-caps-filter').checked = config.automod.capsFilter || false;
+                document.getElementById('cfg-invite-block').checked = config.automod.inviteBlock || false;
+                if (config.automod.logChannel) {
+                    const select = document.getElementById('cfg-log-channel');
+                    // Check if option exists, if not add it temporarily so it shows
+                    if (![...select.options].some(opt => opt.value === config.automod.logChannel)) {
+                        const opt = document.createElement('option');
+                        opt.value = config.automod.logChannel;
+                        opt.text = `#${config.automod.logChannelName || config.automod.logChannel}`;
+                        select.add(opt);
+                    }
+                    select.value = config.automod.logChannel;
+                }
+            }
+
+            const antinukeToggle = document.getElementById('mod-antinuke');
+            if (antinukeToggle) {
+                antinukeToggle.checked = config.modules?.antinuke || false;
+                updateAntiNukeUI();
+            }
+
+            // Whitelist
+            if (document.getElementById('cfg-whitelist')) {
+                document.getElementById('cfg-whitelist').value = (config.whitelist || []).join(', ');
+                renderWhitelistChips();
+            }
+        }
+
+        async function pushModuleState(mod, enabled) {
+            if (!activeGuild) return;
+            try {
+                await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${activeGuild.id}/modules/${mod}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-user-id': currentUser.id },
+                    body: JSON.stringify({ enabled })
+                });
+            } catch (e) {}
+        }
+
+        function updateAutoModUI() {
+            const toggle = document.getElementById('mod-automod');
+            const statusText = document.getElementById('automod-status-label');
+            if (!toggle || !statusText) return;
+            if (toggle.checked) {
+                statusText.innerText = 'AutoMod Status (Enabled)';
+                statusText.style.color = 'var(--accent-red)';
+            } else {
+                statusText.innerText = 'AutoMod Status (Disabled)';
+                statusText.style.color = 'var(--text-gray)';
+            }
+        }
+        function updateAntiNukeUI() {
+            const toggle = document.getElementById('mod-antinuke');
+            const statusText = document.getElementById('antinuke-status-label');
+            if (!toggle || !statusText) return;
+            if (toggle.checked) {
+                statusText.innerText = 'Anti Nuke Status (Enabled)';
+                statusText.style.color = 'var(--accent-red)';
+            } else {
+                statusText.innerText = 'Anti Nuke Status (Disabled)';
+                statusText.style.color = 'var(--text-gray)';
+            }
+        }
+
+        async function saveGuildConfig() {
+            if (!activeGuild) return;
+
+            const saveBtn = document.querySelector('.btn-primary');
+            const originalContent = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveBtn.disabled = true;
+
+            const config = {
+                prefix: document.getElementById('cfg-prefix').value,
+                language: document.getElementById('cfg-lang').value,
+                modules: {
+                    automod: document.getElementById('mod-automod').checked,
+                    moderation: true, 
+                    antinuke: document.getElementById('mod-antinuke').checked,
+                    logging: true,
+                    fun: true
+                },
+                automod: {
+                    enabled: document.getElementById('mod-automod').checked,
+                    linkBlock: document.getElementById('cfg-link-block').checked,
+                    capsFilter: document.getElementById('cfg-caps-filter').checked,
+                    inviteBlock: document.getElementById('cfg-invite-block').checked,
+                    logChannel: document.getElementById('cfg-log-channel')?.value || ''
+                },
+                
+                whitelist: document.getElementById('cfg-whitelist')?.value.split(',').map(id => id.trim()).filter(id => id) || []
+            };
+
+            try {
+                const res = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${activeGuild.id}/config`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-user-id': currentUser.id
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                if (res.ok) {
+                    showToast('Configuration saved and synced!', 'success');
+                } else {
+                    const error = await res.json();
+                    showToast(error.error || 'Failed to save configuration.', 'error');
+                }
+            } catch (err) {
+                showToast('Network error while saving.', 'error');
+            } finally {
+                saveBtn.innerHTML = originalContent;
+                saveBtn.disabled = false;
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.style.cssText = `
+                    position: fixed;
+                    bottom: 24px;
+                    right: 24px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                    z-index: 10000;
+                    pointer-events: none;
+                `;
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.style.pointerEvents = 'auto';
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                         type === 'error' ? 'fa-exclamation-circle' : 
+                         type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            const color = type === 'success' ? '#00c853' : 
+                          type === 'error' ? '#ff3333' : 
+                          type === 'warning' ? '#ffab00' : '#2196f3';
+
+            toast.style.cssText = `
+                background: rgba(10, 10, 10, 0.95);
+                backdrop-filter: blur(10px);
+                border: 1px solid ${color}44;
+                border-left: 4px solid ${color};
+                color: #fff;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                transform: translateX(120%);
+                transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                min-width: 320px;
+                max-width: 450px;
+            `;
+
+            toast.innerHTML = `
+                <i class="fas ${icon}" style="color: ${color}; font-size: 1.2rem;"></i>
+                <div style="flex: 1; line-height: 1.4;">${msg}</div>
+                <i class="fas fa-times" style="cursor: pointer; color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;" onclick="this.parentElement.style.transform='translateX(120%)'; setTimeout(()=>this.parentElement.remove(), 400)"></i>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+            }, 10);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.transform = 'translateX(120%)';
+                    setTimeout(() => toast.remove(), 400);
+                }
+            }, 5000);
+        }
+
+        async function fetchBotStatus() {
+            try {
+                const res = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/status`);
+                const data = await res.json();
+                updateBotStatusUI(data);
+            } catch (err) {
+                console.error('Status fetch failed');
+            }
+        }
+
+        // --- Member Whitelist Helpers ---
+        let allGuildMembers = []; // members list removed from UI
+        function renderWhitelistChips() {
+            const chipsWrap = document.getElementById('whitelist-chips');
+            const textarea = document.getElementById('cfg-whitelist');
+            if (!chipsWrap || !textarea) return;
+            chipsWrap.innerHTML = '';
+            const ids = textarea.value.split(',').map(x => x.trim()).filter(Boolean);
+            const counter = document.getElementById('whitelist-count');
+            if (counter) counter.innerText = `${ids.length} IDs`;
+            ids.forEach(id => {
+                const chip = document.createElement('span');
+                chip.style.cssText = 'display:inline-flex;align-items:center;gap:6px;background:rgba(255,51,51,0.12);color:#fff;border:1px solid rgba(255,51,51,0.3);padding:4px 10px;border-radius:16px;font-size:0.75rem;';
+                const avatarIndex = (parseInt(id,10)||0) % 5;
+                const avatar = `https://cdn.discordapp.com/embed/avatars/${avatarIndex}.png`;
+                chip.innerHTML = `<img src="${avatar}" style="width:16px;height:16px;border-radius:50%;"> ${id} <i class="fas fa-times" style="cursor:pointer;"></i>`;
+                chip.querySelector('i').onclick = () => {
+                    const list = textarea.value.split(',').map(x => x.trim()).filter(Boolean).filter(x => x !== id);
+                    textarea.value = list.join(', ');
+                    renderWhitelistChips();
+                };
+                chipsWrap.appendChild(chip);
+            });
+        }
+
+        function normalizeIds(str) {
+            return (str || '')
+                .split(/[,\\s]+/g)
+                .map(x => x.trim())
+                .filter(x => x && /^\\d{10,20}$/.test(x));
+        }
+        function getWhitelist() {
+            const textarea = document.getElementById('cfg-whitelist');
+            return normalizeIds(textarea.value);
+        }
+        function setWhitelist(list) {
+            const textarea = document.getElementById('cfg-whitelist');
+            textarea.value = (list || []).join(', ');
+            renderWhitelistChips();
+        }
+        function uniqueWhitelistFn() {
+            const u = Array.from(new Set(getWhitelist()));
+            setWhitelist(u);
+            showToast('Whitelist deduplicated', 'success');
+        }
+        function sortWhitelistFn() {
+            const s = getWhitelist().sort((a,b) => a.localeCompare(b));
+            setWhitelist(s);
+            showToast('Whitelist sorted', 'success');
+        }
+        async function pasteWhitelistFn() {
+            try {
+                const text = await navigator.clipboard.readText();
+                const combined = getWhitelist().concat(normalizeIds(text));
+                setWhitelist(Array.from(new Set(combined)));
+                showToast('Pasted IDs added', 'success');
+            } catch (e) {
+                showToast('Paste failed', 'error');
+            }
+        }
+        function exportWhitelistFn() {
+            const data = getWhitelist();
+            const blob = new Blob([JSON.stringify({ whitelist: data }, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'whitelist.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        document.getElementById('paste-whitelist')?.addEventListener('click', pasteWhitelistFn);
+        document.getElementById('unique-whitelist')?.addEventListener('click', uniqueWhitelistFn);
+        document.getElementById('sort-whitelist')?.addEventListener('click', sortWhitelistFn);
+        document.getElementById('export-whitelist')?.addEventListener('click', exportWhitelistFn);
+        document.getElementById('whitelist-add-input')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('whitelist-add-btn')?.click();
+        });
+        // Members UI removed: stubs kept for compatibility
+        async function fetchGuildMembers(guildId) { /* no-op */ }
+        function renderMembers(members) { /* no-op */ }
+
+        function toggleWhitelistMember(userId, userName) {
+            const textarea = document.getElementById('cfg-whitelist');
+            let whitelist = textarea.value.split(',').map(id => id.trim()).filter(id => id);
+            
+            if (whitelist.includes(userId)) {
+                // Remove
+                whitelist = whitelist.filter(id => id !== userId);
+                showToast(`Removed ${userName || userId} from whitelist`, 'success');
+            } else {
+                // Add (Check for duplicates again just in case)
+                if (!whitelist.includes(userId)) {
+                    whitelist.push(userId);
+                    showToast(`Added ${userName || userId} to whitelist`, 'success');
+                }
+            }
+            
+            textarea.value = whitelist.join(', ');
+            // Re-render chips
+            renderWhitelistChips();
+        }
+
+        // Members UI removed: search/reload controls no longer present
+        document.getElementById('add-self-whitelist')?.addEventListener('click', () => {
+            const textarea = document.getElementById('cfg-whitelist');
+            let whitelist = textarea.value.split(',').map(id => id.trim()).filter(id => id);
+            if (!whitelist.includes(currentUser.id)) {
+                whitelist.push(currentUser.id);
+                textarea.value = whitelist.join(', ');
+                showToast('Added you to whitelist', 'success');
+                renderWhitelistChips();
+            }
+        });
+        document.getElementById('whitelist-add-btn')?.addEventListener('click', () => {
+            const input = document.getElementById('whitelist-add-input');
+            const textarea = document.getElementById('cfg-whitelist');
+            const id = (input.value || '').trim();
+            if (!id) return;
+            let list = textarea.value.split(',').map(x => x.trim()).filter(Boolean);
+            if (!list.includes(id)) list.push(id);
+            textarea.value = list.join(', ');
+            input.value = '';
+            renderWhitelistChips();
+        });
+        document.getElementById('cfg-whitelist')?.addEventListener('input', () => {
+            renderWhitelistChips();
+        });
+        document.getElementById('clear-whitelist')?.addEventListener('click', () => {
+            const textarea = document.getElementById('cfg-whitelist');
+            textarea.value = '';
+            showToast('Cleared whitelist', 'success');
+            renderWhitelistChips();
+        });
+        document.getElementById('copy-whitelist')?.addEventListener('click', async () => {
+            const textarea = document.getElementById('cfg-whitelist');
+            try {
+                await navigator.clipboard.writeText(textarea.value);
+                showToast('Copied whitelist', 'success');
+            } catch (e) {
+                showToast('Copy failed', 'error');
+            }
+        });
+
+        // --- Recent Logs Live (Dashboard-only) ---
+        let recentLogs = [];
+        const allowedTypes = new Set(['CONFIG_UPDATE','PREFIX_UPDATE','MODULE_UPDATE','WHITELIST_UPDATE','FULL_SYNC']);
+        function timeAgo(ts) {
+            const d = new Date(ts);
+            const s = Math.floor((Date.now() - d.getTime())/1000);
+            if (s < 60) return `${s}s ago`;
+            const m = Math.floor(s/60); if (m < 60) return `${m}m ago`;
+            const h = Math.floor(m/60); if (h < 24) return `${h}h ago`;
+            const days = Math.floor(h/24); return `${days}d ago`;
+        }
+        function renderRecentLogs(list) {
+            const wrap = document.getElementById('recent-logs');
+            const typeFilter = document.getElementById('recent-log-type')?.value || '';
+            const q = (document.getElementById('recent-log-search')?.value || '').toLowerCase();
+            if (!wrap) return;
+            wrap.innerHTML = '';
+            const filtered = (list || []).filter(it => {
+                const t = String(it.type || '').toUpperCase();
+                if (!allowedTypes.has(t)) return false;
+                if (typeFilter && t !== typeFilter) return false;
+                const text = `${it.type || ''} ${it.guildId || ''} ${it.userId || ''} ${it.details || ''}`.toLowerCase();
+                return !q || text.includes(q);
+            });
+            if (filtered.length === 0) {
+                wrap.innerHTML = '<div style="text-align:center; color: var(--text-muted); font-size: 0.8rem;">No activity yet</div>';
+                return;
+            }
+            filtered.slice(0, 100).forEach(it => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--glass-border);border-radius:10px;margin-bottom:8px;background:rgba(0,0,0,0.25)';
+                const avatar = it.userAvatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                const badgeColor = it.type === 'WHITELIST_UPDATE' ? 'rgba(0, 150, 255, 0.15)'
+                                  : it.type === 'MODULE_UPDATE' ? 'rgba(255, 165, 0, 0.15)'
+                                  : 'rgba(255,255,255,0.06)';
+                item.innerHTML = `
+                    <img src="${avatar}" style="width:24px;height:24px;border-radius:50%;border:1px solid var(--glass-border);">
+                    <div style="flex:1;min-width:0;">
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <span style="padding:2px 8px;border-radius:10px;background:${badgeColor};color:#fff;font-weight:800;font-size:0.7rem;">${(it.type || '').toString()}</span>
+                            <span style="color:#fff;font-weight:800; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${it.userName || it.userId || 'User'}</span>
+                            <span style="color:var(--text-muted);font-size:0.7rem;">${it.guildId || ''}</span>
+                        </div>
+                        <div style="color:var(--text-gray);font-size:0.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.details || ''}</div>
+                    </div>
+                    <span style="color:var(--text-muted);font-size:0.7rem;">${timeAgo(it.timestamp || Date.now())}</span>
+                `;
+                wrap.appendChild(item);
+            });
+        }
+        document.getElementById('recent-log-type')?.addEventListener('change', () => renderRecentLogs(recentLogs));
+        document.getElementById('recent-log-search')?.addEventListener('input', () => renderRecentLogs(recentLogs));
+        socket.on('recent_logs_snapshot', (logs) => {
+            recentLogs = Array.isArray(logs) ? logs : [];
+            renderRecentLogs(recentLogs);
+        });
+        socket.on('recent_log', (log) => {
+            recentLogs = [log].concat(recentLogs).slice(0, 200);
+            renderRecentLogs(recentLogs);
+        });
+        // --- Channel Logging Helpers ---
+        async function fetchGuildChannels(guildId) {
+            const select = document.getElementById('cfg-log-channel');
+            // Keep the "Select" and "Auto-create" options
+            const defaultOptions = `
+                <option value="" disabled selected>Select a channel...</option>
+                <option value="AUTO_CREATE" style="background: var(--bg-dark); color: #fff;">✨ Auto-create 'hitman-logs'</option>
+            `;
+            select.innerHTML = defaultOptions;
+
+            // Try Socket first, fallback to REST
+            let channels = [];
+            try {
+                const wsToken = localStorage.getItem('bot_ws_token') || '';
+                channels = await new Promise(resolve => {
+                    let done = false;
+                    const to = setTimeout(() => { if (!done) resolve([]); }, 6000);
+                    socket.timeout(5000).emit('getChannels', { token: wsToken, guildId }, (err, responses) => {
+                        done = true;
+                        clearTimeout(to);
+                        if (!err || err.length === 0) {
+                            const res = Array.isArray(responses) ? responses[0] : responses;
+                            if (res && res.success && Array.isArray(res.data)) {
+                                return resolve(res.data);
+                            }
+                        }
+                        resolve([]);
+                    });
+                });
+            } catch (e) {}
+            if (!Array.isArray(channels) || channels.length === 0) {
+                try {
+                    const res = await fetch(`${FRONTEND_CONFIG.BACKEND_URL}/api/bot/guilds/${guildId}/channels`, {
+                        headers: { 'x-user-id': currentUser.id }
+                    });
+                    if (res.ok) channels = await res.json();
+                } catch (err) {
+                    console.warn('Channel REST fallback failed');
+                }
+            }
+            if (Array.isArray(channels)) {
+                channels.forEach(ch => {
+                    const opt = document.createElement('option');
+                    opt.value = ch.id;
+                    opt.text = `# ${ch.name}`;
+                    opt.style.background = 'var(--bg-dark)';
+                    opt.style.color = '#fff';
+                    select.add(opt);
+                });
+            }
+        }
+    </script>
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" onclick="hideLogoutModal()">
+        <div class="logout-card" onclick="event.stopPropagation()">
+            <h3>Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div class="logout-actions">
+                <button class="btn btn-outline" onclick="hideLogoutModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

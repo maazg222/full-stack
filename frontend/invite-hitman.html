@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Bot | Agency Development</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="clean-urls.js" defer></script>
+    <style>
+        .choose-hero {
+            padding-top: 150px;
+            padding-bottom: 40px;
+            text-align: center;
+            position: relative;
+        }
+        .choose-hero h1 {
+            font-size: clamp(2.6rem, 6vw, 3.6rem);
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            background: linear-gradient(180deg, #fff 0%, #9c9c9c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .premium-chip {
+            display: inline-block;
+            margin-bottom: 14px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(255, 51, 51, 0.12);
+            border: 1px solid var(--accent-red-glow);
+            color: var(--accent-red);
+            font-weight: 800;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .lux-bg {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(900px 400px at 20% 10%, rgba(255,51,51,0.08), transparent 60%),
+                        radial-gradient(800px 400px at 80% 20%, rgba(88,101,242,0.08), transparent 60%);
+            z-index: 0;
+        }
+        .bot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto 80px;
+            position: relative;
+            z-index: 1;
+        }
+        .bot-card {
+            background: rgba(13,13,13,0.75);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 2.2rem;
+            transition: transform 0.28s ease, box-shadow 0.28s ease;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+            position: relative;
+            will-change: transform;
+            contain: content;
+        }
+        .bot-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 20px 48px rgba(0,0,0,0.45);
+        }
+        .bot-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 1px;
+            border-radius: 28px;
+            background: linear-gradient(90deg, rgba(255,51,51,0.6), rgba(88,101,242,0.6), rgba(255,51,51,0.6));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .bot-card:hover::before {
+            opacity: 0.6;
+        }
+        .bot-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 0.8rem;
+        }
+        .bot-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        .bot-title {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        .bot-desc {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            margin-bottom: 1.2rem;
+            line-height: 1.6;
+        }
+        .bot-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        .bot-actions .btn-primary {
+            border-radius: 999px;
+            box-shadow: 0 8px 18px var(--accent-red-muted);
+            will-change: transform;
+        }
+        .bot-actions .btn-outline {
+            border-radius: 999px;
+        }
+        .hitman-theme {
+            border-color: var(--accent-red-glow);
+        }
+        .hitman-theme .bot-icon {
+            border-color: var(--accent-red-glow);
+            filter: drop-shadow(0 0 12px var(--accent-red-glow));
+        }
+        .agxz-theme {
+            border-color: rgba(59,130,246,0.3);
+        }
+        .agxz-theme .bot-icon {
+            border-color: rgba(59,130,246,0.3);
+            filter: drop-shadow(0 0 12px rgba(59,130,246,0.25));
+        }
+        .soon-badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border:1px solid rgba(59,130,246,0.3);
+            border-radius: 8px;
+            color:#3b82f6;
+            font-weight:700;
+            font-size:0.75rem;
+            margin-bottom:0.6rem;
+            background: rgba(59,130,246,0.08);
+        }
+        .shine {
+            position: absolute;
+            inset: -2px;
+            border-radius: 30px;
+            background: radial-gradient(120px 30px at 20% -10%, rgba(255,255,255,0.2), transparent 60%),
+                        radial-gradient(120px 30px at 80% 110%, rgba(255,255,255,0.08), transparent 60%);
+            pointer-events: none;
+        }
+        .notice-bar {
+            max-width: 1100px;
+            margin: 0 auto 20px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+        .notice-bar i {
+            color: var(--accent-red);
+        }
+        .notice-inline-blue {
+            background: rgba(59,130,246,0.08);
+            border: 1px solid rgba(59,130,246,0.3);
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #cfe6ff;
+            font-size: 0.85rem;
+            margin-top: 0.8rem;
+        }
+        .notice-inline-blue i {
+            color: #3b82f6;
+        }
+        .notice-inline-blue a {
+            color: #cfe6ff;
+            font-weight: 700;
+            text-decoration: underline;
+        }
+        .notice-inline-blue .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #3b82f6;
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 8px 18px rgba(59,130,246,0.25);
+            font-weight: 800;
+        }
+        .notice-inline-blue .cta i {
+            color: #fff;
+        }
+        .feature-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+        .chip {
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(59,130,246,0.3);
+            background: rgba(59,130,246,0.08);
+            color: #cfe6ff;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .chip-red {
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--accent-red-glow);
+            background: rgba(255,51,51,0.08);
+            color: #ffd6d6;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="home.html" class="logo">AGENCY<span>DEV</span></a>
+            <div class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="bots.html">Bots</a>
+                <a href="commands.html">Commands</a>
+                <a href="pricing.html">Premium</a>
+                <a href="community.html">Community</a>
+            </div>
+            <div class="nav-btns" id="nav-auth-btns">
+                <a href="dashboard.html" class="btn btn-outline">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-bottom: 120px;">
+        <div class="choose-hero">
+            <div class="lux-bg"></div>
+            <span class="premium-chip">Choose Bot</span>
+            <h1>AGENCY BOT DEPLOYMENT.</h1>
+            <p style="color: var(--text-gray); font-size: 1rem; max-width: 620px; margin: 0 auto;">Invite HITMAN now. AGXZ Dashboard is coming soon.</p>
+        </div>
+
+        <div class="notice-bar">
+            <i class="fas fa-info-circle"></i>
+            <span>To use the Dashboard, invite HITMAN. AGXZ Dashboard is coming soon — you can still use the AGXZ bot fully without the Dashboard.</span>
+        </div>
+
+        <div class="bot-grid">
+            <div class="bot-card hitman-theme">
+                <div class="shine"></div>
+                <div class="bot-header">
+                    <div class="bot-icon">
+                        <img src="hitman-logo.png" alt="HITMAN Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="bot-title">HITMAN</div><span class="chip-red">DEV BY MAAZ</span>
+                </div>
+                <div class="bot-desc">Uncompromising security and performance for professional communities.</div>
+                <div class="bot-actions">
+                    <a href="https://discord.com/api/oauth2/authorize?client_id=1405503287129804883&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fapi%2Fauth%2Fdiscord%2Fcallback&response_type=code&scope=identify%20guilds%20bot%20applications.commands&permissions=8&state=dashboard" onclick="try{localStorage.setItem('post_after_invite','dashboard')}catch(e){}" class="btn btn-primary">Invite Now</a>
+                    <a href="commands.html?bot=hitman" class="btn btn-outline">Commands</a>
+                </div>
+            </div>
+
+            <div class="bot-card agxz-theme">
+                <div class="shine"></div>
+                <div class="bot-header">
+                    <div class="bot-icon">
+                        <img src="agxz-logo.png" alt="AGXZ Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="bot-title">AGXZ</div><span class="chip">DEV BY LEGEND</span>
+                </div>
+                <div class="bot-desc">Engineered for absolute reliability, protection, and peak performance.</div>
+                <div class="bot-actions">
+                    <a href="https://discord.com/oauth2/authorize?client_id=1475186184681558107&permissions=8&integration_type=0&scope=bot+applications.commands" class="btn btn-primary" style="background: #3b82f6;">Invite AGXZ</a>
+                    <a href="commands.html?bot=agxz" class="btn btn-outline">Commands</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

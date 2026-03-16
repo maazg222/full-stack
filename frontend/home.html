@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGENCY DEV | Elite Discord Security</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="clean-urls.js" defer></script>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="home" class="logo">AGENCY<span>DEV</span></a>
+            <div class="nav-links">
+                <a href="home">Home</a>
+                <a href="bots">Bots</a>
+                <a href="commands">Commands</a>
+                <a href="pricing">Premium</a>
+                <a href="community">Community</a>
+            </div>
+            <div class="nav-btns" id="nav-auth-btns">
+                <a href="/api/auth/discord" class="btn btn-primary">Login with Discord</a>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hashParams = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+            const userFromUrl = urlParams.get('user_data') || hashParams.get('user_data');
+            
+            if (userFromUrl) {
+                try {
+                    const userData = JSON.parse(decodeURIComponent(userFromUrl));
+                    localStorage.setItem('agency_chat_user', JSON.stringify(userData));
+                    // Clean URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+
+            updateAuthUI();
+            const post = urlParams.get('post') || hashParams.get('post');
+            if (post === 'dashboard') {
+                window.location.href = 'dashboard';
+            }
+            const postAfterInvite = localStorage.getItem('post_after_invite');
+            if (postAfterInvite === 'dashboard') {
+                localStorage.removeItem('post_after_invite');
+                window.location.href = 'dashboard';
+            }
+        });
+
+        function updateAuthUI() {
+            const navBtns = document.getElementById('nav-auth-btns');
+            const userStr = localStorage.getItem('agency_chat_user');
+            
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                navBtns.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <a href="dashboard" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Dashboard</a>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 5px 12px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                            <img src="${user.avatar}" style="width: 24px; height: 24px; border-radius: 50%;" alt="Avatar">
+                            <span style="font-weight: 600; font-size: 0.85rem;">${user.name}</span>
+                            <a href="#" onclick="logout()" style="color: var(--accent-red); margin-left: 5px; font-size: 0.8rem;"><i class="fas fa-sign-out-alt"></i></a>
+                        </div>
+                    </div>
+                `;
+            } else {
+                navBtns.innerHTML = `
+                    <a href="/api/auth/discord?state=dashboard" class="btn btn-primary">Login with Discord</a>
+                `;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('agency_chat_user');
+            window.location.reload();
+        }
+    </script>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <span class="hero-tag">SYSTEM STATUS: OPTIMIZED & SECURE</span>
+                <h1>Agency Development.</h1>
+                 <p>Antinuke Protection. Secure Infrastructure. Optimized Global Performance Reliability without compromise. </p>
+                <div class="hero-btns">
+                    <a href="/api/auth/discord?state=dashboard" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1rem;">MANAGE SERVER</a>
+                    <a href="community.html" class="btn btn-outline" style="padding: 1rem 2.5rem; font-size: 1rem;">View Community</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Bar -->
+        <div class="container">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <h2 class="counter" data-target="120">0</h2>
+                    <p>Protected Servers</p>
+                </div>
+                <div class="stat-item">
+                    <h2 class="counter" data-target="500">0</h2>
+                    <p>Daily Events</p>
+                </div>
+                <div class="stat-item">
+                    <h2 class="counter" data-target="99">0</h2>
+                    <p>Uptime %</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <section style="padding: 100px 0;">
+            <div class="container">
+                <span class="section-label">Core Capabilities</span>
+                <h2 class="section-title">Powerful and Reliable.</h2>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-radiation"></i></div>
+                        <h3>Antinuke</h3>
+                        <p>Military-grade protection against mass bans, kicks, and unauthorized role changes with sub-second response times.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Security</h3>
+                        <p>Multi-layered security protocols ensuring your community remains a safe haven against all external threats.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                        <h3>Automod</h3>
+                        <p>Intelligent AI-driven moderation that filters threats, spam, and malicious links in real-time.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-music"></i></div>
+                        <h3>Music</h3>
+                        <p>High-fidelity audio streaming with global low-latency nodes for a crystal clear community experience.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-gavel"></i></div>
+                        <h3>Moderation</h3>
+                        <p>Powerful tools for staff to manage and protect your server with ease and precision.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-gamepad"></i></div>
+                        <h3>Fun & Games</h3>
+                        <p>Interactive entertainment features and games to keep your community engaged and active.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-tools"></i></div>
+                        <h3>Utilities</h3>
+                        <p>Essential tools and commands designed to streamline and enhance your server management.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-desktop"></i></div>
+                        <h3>Dashboard</h3>
+                        <p>Total command and control from any device. Manage your community, configure settings, and monitor logs through our high-performance Dashboard interface.</p>
+                    </div>
+                    <div class="feature-card" style="border-color: var(--accent-red-glow);">
+                        <div class="feature-icon" style="background: var(--accent-red); color: #fff;"><i class="fas fa-plus"></i></div>
+                        <h3>Much More</h3>
+                        <p>A comprehensive suite of additional features constantly updated for the modern Discord ecosystem.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section style="padding: 100px 0; text-align: center;">
+            <div class="container" style="background: linear-gradient(180deg, var(--bg-dark) 0%, transparent 100%); padding: 5rem; border-radius: 40px; border: 1px solid var(--glass-border);">
+                <h2 style="font-size: 3rem; font-weight: 800; margin-bottom: 1.5rem;">Ready to upgrade your security?</h2>
+                <p style="color: var(--text-gray); margin-bottom: 3rem; font-size: 1.2rem;">Join thousands of communities that trust Agency Dev for their protection.</p>
+                <a href="bots.html" class="btn btn-primary" style="padding: 1.2rem 3.5rem; font-size: 1.1rem;">Get Started Now</a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="padding: 5rem 0; border-top: 1px solid var(--glass-border);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">&copy; 2026 Agency Dev. All rights reserved.</p>
+            <div style="display: flex; gap: 2rem;">
+                <a href="https://www.instagram.com/not_.maaz/" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Instagram</a>
+                <a href="https://discord.gg/wsjqAa8kpB" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Discord</a>
+                <a href="privacy" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Privacy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
